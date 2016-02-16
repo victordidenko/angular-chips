@@ -1,0 +1,28 @@
+{
+  "name": "chips",
+  "authors": [
+    "Mohammed Basheer"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "keywords": [
+    "angular",
+    "chips"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular": "~1.4.8"
+  },
+  "dependencies": {
+    "bootstrap": "~3.3.6"
+  }
+}

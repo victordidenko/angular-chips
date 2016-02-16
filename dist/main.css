@@ -1,0 +1,27 @@
+chip-tmpl {
+  display: inline-block;
+  margin: 0 5px 5px 0; }
+
+.default-chip {
+  border: 2px solid #e0e0e0;
+  border-radius: 5px;
+  background: #e0e0e0;
+  padding: 5px; }
+
+chips {
+  display: block;
+  padding: 5px; }
+  chips > div {
+    display: inline; }
+    chips > div > input[chip-control] {
+      height: 100%;
+      border: none;
+      font-size: 14px; }
+    chips > div > input[chip-control]:focus {
+      outline: none; }
+
+.chip-out-focus {
+  border-bottom: 1px solid #e0e0e0; }
+
+.chip-in-focus {
+  border-bottom: 1px solid #106cc8; }
