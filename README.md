@@ -1,0 +1,1 @@
+It's Angular UI component. Use full for single and multiple selection.
