@@ -8,7 +8,6 @@
     }
 
     function Chips($compile, $timeout, DomUtil) {
-
         function linkFun(scope, iElement, iAttrs, ngModelCtrl) {
             if ((error = validation(iElement)) !== undefined) {
                 throw error;
