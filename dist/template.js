@@ -9,14 +9,3 @@ module.run(["$templateCache", function($templateCache) {
     "</div>");
 }]);
 })();
-
-(function(module) {
-try { module = angular.module("angular.chips"); }
-catch(err) { module = angular.module("angular.chips", []); }
-module.run(["$templateCache", function($templateCache) {
-  "use strict";
-  $templateCache.put("src/templates/chips.tmpl.html",
-    "<div ng-transclude></div>\n" +
-    "");
-}]);
-})();

@@ -1,17 +1,4 @@
 (function() {
-  angular.module('angular.chips',[])
-    .directive('chip', Chip);
-  function Chip() {
-    return {
-      restrict: 'E',
-      require: '^chips',
-      templateUrl: 'src/templates/chip.tmpl.html',
-      transclude: true,
-    }
-  };
-})();
-
-(function() {
     angular.module('angular.chips')
         .directive('chips', Chips)
         .controller('chipsController', ChipsController)
@@ -85,6 +72,10 @@
                 DomUtil.removeClass($element,'chip-in-focus')
                 DomUtil.addClass($element,'chip-out-focus')
             }
+        }
+
+        this.remove = function(index){
+            console.log('chips ',index);
         }
     }
 })();

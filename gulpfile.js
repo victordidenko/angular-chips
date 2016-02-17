@@ -9,13 +9,14 @@ var sass = require('gulp-sass');
 gulp.task('default', ['build']);
 
 gulp.task('build', function() {
-    return runSequence('html2js', 'sass', 'concat', 'copy', 'connect');
+    return runSequence('html2js', 'sass', 'concat', 'connect');
 })
 
 gulp.task('concat', function() {
     return gulp.src(['src/js/**/*.js', 'dist/template.js'])
-        .pipe(concat('chips.js'))
-        .pipe(gulp.dest('dist/'));
+        .pipe(concat('angular-chips.js'))
+        .pipe(gulp.dest('dist/'))
+        .pipe(connect.reload());
 });
 
 gulp.task('html2js', function() {
@@ -31,44 +32,24 @@ gulp.task('html2js', function() {
 gulp.task('sass', function() {
     return gulp.src('src/css/main.scss')
         .pipe(sass().on('error', sass.logError))
-        .pipe(gulp.dest('dist/'));
-})
-
-gulp.task('copy', function() {
-    return gulp.src([
-            'dist/chips.js',
-            'dist/main.css',
-            'bower_components/bootstrap/dist/css/bootstrap.min.css',
-            'bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.ttf',
-            'bower_components/angular/angular.js',
-        ])
-        .pipe(gulp.dest('input_demo/lib'))
+        .pipe(gulp.dest('dist/'))
         .pipe(connect.reload());
 });
 
-gulp.watch(['src/js/**/*.js','input_demo/js/*.js'], function() {
-    runSequence('concat', 'copy');
+gulp.watch(['src/js/**/*.js','input_demo/js/*.js'], function(){
+    gulp.run('concat');
 });
 
 gulp.watch(['src/templates/*.html','input_demo/index.html'], function() {
-    runSequence('html2js', 'concat', 'copy');
+    runSequence('html2js', 'concat');
 });
 
-gulp.task('copycss', function() {
-    return gulp.src([
-            'dist/main.css',
-        ])
-        .pipe(gulp.dest('input_demo/lib'))
-});
-
-gulp.watch('src/css/main.scss', function(files) {
-    runSequence('sass', 'copy');
+gulp.watch('src/css/main.scss', function(){
+    gulp.run('sass');
 });
 
 gulp.task('connect', function() {
     var server = connect.server({
-        root: 'input_demo',
-        fallBack: 'index.html',
         livereload: true,
         port: 9000,
     });

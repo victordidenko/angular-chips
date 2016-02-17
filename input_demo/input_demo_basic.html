@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/dist/main.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/components-font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" type="text/css" href="input_demo.css">
+</head>
+
+<body ng-app="sample">
+    <div ng-controller="inputDemoController as inputdemo">
+        <div>{{list}}</div>
+        <chips ng-model="list" render="inputdemo.updatedValue(data)">
+            <chip-tmpl>
+                <div class="default-chip">
+                    {{chip}}
+                    <span class="glyphicon glyphicon-remove" remove-chip="inputdemo.remove"></span>
+                    <!-- <div class="loader-container">
+                        <i class="fa fa-spinner fa-spin fa-lg loader"></i>
+                    </div> -->
+                </div>
+            </chip-tmpl>
+            <input chip-control></input>
+        </chips>
+    </div>
+</body>
+<script type="text/javascript" src="/bower_components/angular/angular.js"></script>
+<script type="text/javascript" src="/dist/angular-chips.js"></script>
+<script type="text/javascript" src="app.js"></script>
+<script type="text/javascript" src="inputDemoController.js"></script>
+
+</html>
