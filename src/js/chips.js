@@ -69,8 +69,10 @@
                         chipTmpls[chipTmpls.length - 1].focus();
                         navigate = chipNavigator(chipTmpls.length - 1);
                     } else if (event.target.nodeName === 'CHIP-TMPL') {
-                        event.stopImmediatePropagation();
-                        console.log(document.activeElement)
+                        var chipScope = angular.element(document.activeElement).scope()
+                        if(chipScope.$index > -1)
+                            scope.chips.deleteChip(chipScope.$index);
+                        event.preventDefault();
                     }
                 }else if(event.code === 'ArrowLeft' || event.code === 'ArrowRight'){
                     iElement.find('chip-tmpl')[navigate(event.code)].focus();
