@@ -3,10 +3,9 @@
 	.controller('inputDemoController', InputDemoController);
 
 	function InputDemoController($scope, $interval, $timeout){
-		$scope.list = ['sample sss'];
+		$scope.list = ['sample','again'];
 
 		this.updatedValue = function(val){
-			// return $timeout(1000);
 			return 'got it '+ val;
 		}
 
