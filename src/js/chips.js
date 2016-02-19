@@ -14,12 +14,12 @@
             }
             /*addChips method should be called by input control. pls check the input_control.js*/
             scope.chips.addChip = function(data) {
-                var modified;
-                scope.render !== undefined ? modified = scope.render({ data: data }) : modified = data;
-                isPromiseLike(modified) ? modified.then(update) : update();
+                var updatedData;
+                scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
+                isPromiseLike(updatedData) ? updatedData.then(update) : update();
 
                 function update() {
-                    scope.chips.list.push(modified);
+                    scope.chips.list.push(updatedData);
                     ngModelCtrl.$setViewValue(scope.chips.list);
                 }
             };
@@ -33,17 +33,48 @@
                 scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
             }
 
+            scope.chips.index = function($index) {
+                console.log(this.list.length, $index, this.list[$index], (this.list.length - $index));
+                return this.list.length - $index;
+            }
+
+            function chipNavigator(index) {
+                return function(direction) {
+                    direction === 'ArrowLeft' ? index-- : index++;
+                    index = index < 0 ? scope.chips.list.length - 1 : index > scope.chips.list.length - 1 ? 0 : index;
+                    return index;
+                }
+            }
+
             /*Below code will extract the chip-tmpl and compile inside the chips directive scope*/
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
+            tmpl.attr('tabindex', '{{$index+1}}')
             rootDiv.append(tmpl);
             var node = $compile(rootDiv)(scope);
             iElement.prepend(node);
-
+            /*clicking on chips element should set the focus on INPUT*/
             iElement.on('click', function(event) {
                 if (event.target.nodeName === 'CHIPS')
                     iElement.find('input')[0].focus();
+            });
+
+            var navigate;
+            iElement.on('keydown', function(event) {
+                var chipTmpls;
+                if (event.code === 'Backspace') {
+                    if (event.target.nodeName === 'INPUT' && event.target.value === '') {
+                        chipTmpls = iElement.find('chip-tmpl');
+                        chipTmpls[chipTmpls.length - 1].focus();
+                        navigate = chipNavigator(chipTmpls.length - 1);
+                    } else if (event.target.nodeName === 'CHIP-TMPL') {
+                        event.stopImmediatePropagation();
+                        console.log(document.activeElement)
+                    }
+                }else if(event.code === 'ArrowLeft' || event.code === 'ArrowRight'){
+                    iElement.find('chip-tmpl')[navigate(event.code)].focus();
+                }
             });
 
             DomUtil(iElement).addClass('chip-out-focus');
