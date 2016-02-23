@@ -69,7 +69,7 @@
             });
             /*this method will handle 'delete or Backspace' and left, right key press*/
             iElement.on('keydown', function(event) {
-                if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'CHIP-TMPL')
+                if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'CHIP-TMPL' || (iElement.find('chip-tmpl').length === 0 && event.target.value === ''))
                     return;
 
                 var chipTmpls;
