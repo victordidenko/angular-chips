@@ -38,6 +38,11 @@
                 return this.list.length - $index;
             }
 
+            var chipNavigate = null;
+            /*
+             * @index selected chip index
+             * @return function, which will return the chip index based on left or right arrow pressed
+             */
             function chipNavigator(index) {
                 return function(direction) {
                     direction === 'ArrowLeft' ? index-- : index++;
@@ -45,7 +50,6 @@
                     return index;
                 }
             }
-
             /*Below code will extract the chip-tmpl and compile inside the chips directive scope*/
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
@@ -59,23 +63,41 @@
                 if (event.target.nodeName === 'CHIPS')
                     iElement.find('input')[0].focus();
             });
-
-            var navigate;
+            /*on every focus we need to nullify the chipNavigate*/
+            iElement.find('input').on('focusin', function() {
+                chipNavigate = null;
+            });
+            /*this method will handle 'delete or Backspace' and left, right key press*/
             iElement.on('keydown', function(event) {
+                if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'CHIP-TMPL')
+                    return;
+
                 var chipTmpls;
+
+                function focusOnChip() {
+                    chipTmpls = iElement.find('chip-tmpl');
+                    chipTmpls[chipTmpls.length - 1].focus();
+                    chipNavigate = chipNavigator(chipTmpls.length - 1);
+                }
+
+                function deleteChip() {
+                    var chipScope = angular.element(document.activeElement).scope()
+                    if (chipScope.$index > -1) {
+                        scope.chips.deleteChip(chipScope.$index);
+                        if (chipScope.$index > 0 && chipScope.$index === scope.chips.list.length)
+                            iElement.find('chip-tmpl')[chipScope.$index - 1].focus();
+                    }
+                    event.preventDefault();
+                }
+
                 if (event.code === 'Backspace') {
                     if (event.target.nodeName === 'INPUT' && event.target.value === '') {
-                        chipTmpls = iElement.find('chip-tmpl');
-                        chipTmpls[chipTmpls.length - 1].focus();
-                        navigate = chipNavigator(chipTmpls.length - 1);
+                        focusOnChip();
                     } else if (event.target.nodeName === 'CHIP-TMPL') {
-                        var chipScope = angular.element(document.activeElement).scope()
-                        if(chipScope.$index > -1)
-                            scope.chips.deleteChip(chipScope.$index);
-                        event.preventDefault();
+                        deleteChip();
                     }
-                }else if(event.code === 'ArrowLeft' || event.code === 'ArrowRight'){
-                    iElement.find('chip-tmpl')[navigate(event.code)].focus();
+                } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
+                    chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.code)].focus();
                 }
             });
 
