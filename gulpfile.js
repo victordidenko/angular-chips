@@ -36,11 +36,11 @@ gulp.task('sass', function() {
         .pipe(connect.reload());
 });
 
-gulp.watch(['src/js/**/*.js','input_demo/js/*.js'], function(){
+gulp.watch(['src/js/**/*.js','samples/*.js'], function(){
     gulp.run('concat');
 });
 
-gulp.watch(['src/templates/*.html','input_demo/index.html'], function() {
+gulp.watch(['src/templates/*.html','samples/index.html'], function() {
     runSequence('html2js', 'concat');
 });
 

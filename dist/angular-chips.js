@@ -1,5 +1,28 @@
 (function() {
     angular.module('angular.chips', [])
+        .directive('chipTmpl', ChipTmpl);
+
+    function ChipTmpl() {
+        return {
+            restrict: 'E',
+            transclude: true,
+            link: function(scope, iElement, iAttrs, contrl, transcludefn) {
+                transcludefn(scope, function(clonedTranscludedContent) {
+                    iElement.append(clonedTranscludedContent);
+                });
+                iElement.on('keydown', function(event) {
+                    if (event.code === 'Backspace') {
+                        scope.$broadcast('chip:delete');
+                        event.preventDefault();
+                    }
+                });
+            }
+        }
+    }
+})();
+
+(function() {
+    angular.module('angular.chips')
         .directive('chips', Chips)
         .controller('chipsController', ChipsController);
 
@@ -8,7 +31,7 @@
     }
 
     function Chips($compile, $timeout, DomUtil) {
-        function linkFun(scope, iElement, iAttrs, ngModelCtrl) {
+        function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
             if ((error = validation(iElement)) !== undefined) {
                 throw error;
             }
@@ -34,7 +57,6 @@
             }
 
             scope.chips.index = function($index) {
-                console.log(this.list.length, $index, this.list[$index], (this.list.length - $index));
                 return this.list.length - $index;
             }
 
@@ -54,7 +76,7 @@
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
-            tmpl.attr('tabindex', '{{$index+1}}')
+            tmpl.attr('tabindex', '{{$index}}')
             rootDiv.append(tmpl);
             var node = $compile(rootDiv)(scope);
             iElement.prepend(node);
@@ -80,21 +102,14 @@
                     chipNavigate = chipNavigator(chipTmpls.length - 1);
                 }
 
-                function deleteChip() {
-                    var chipScope = angular.element(document.activeElement).scope()
-                    if (chipScope.$index > -1) {
-                        scope.chips.deleteChip(chipScope.$index);
-                        if (chipScope.$index > 0 && chipScope.$index === scope.chips.list.length)
-                            iElement.find('chip-tmpl')[chipScope.$index - 1].focus();
-                    }
-                    event.preventDefault();
-                }
-
                 if (event.code === 'Backspace') {
                     if (event.target.nodeName === 'INPUT' && event.target.value === '') {
                         focusOnChip();
                     } else if (event.target.nodeName === 'CHIP-TMPL') {
-                        deleteChip();
+                        /*after*/
+                        var chipTemplates = iElement.find('chip-tmpl');
+                        if (chipTemplates.length > 0 && event.target.tabIndex === chipTemplates.length)
+                            iElement.find('chip-tmpl')[chipNavigate('ArrowLeft')].focus();
                     }
                 } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
                     chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.code)].focus();
@@ -160,7 +175,8 @@
             }
             /*chip will be removed if call back method return true*/
         this.removeChip = function(data, index) {
-            var deleteChip = getCallBack(DomUtil($element).attr('remove-chip')[0])(data);
+            var callBack = getCallBack(DomUtil($element).attr('remove-chip')[0]);
+            var deleteChip = callBack !== undefined ? getCallBack(DomUtil($element).attr('remove-chip')[0])(data) : true;
             if (deleteChip) {
                 this.deleteChip(index);
             }
@@ -218,22 +234,29 @@
     }
 })();
 
-(function(){
-	angular.module('angular.chips')
-	.directive('removeChip',RemoveChip);
+(function() {
+    angular.module('angular.chips')
+        .directive('removeChip', RemoveChip);
 
-	function RemoveChip(){
-		return{
-			restrict: 'A',
-			require: '^chips',
-			link: function(scope, iElement, iAttrs, chipsCtrl){
-				iElement.on('click',function(event){
-					chipsCtrl.removeChip(scope.chip,scope.$index);
-				});
-			}
-		}
-	}	
+    function RemoveChip() {
+        return {
+            restrict: 'A',
+            require: '^chips',
+            link: function(scope, iElement, iAttrs, chipsCtrl) {
+                function deleteChip() {
+                    chipsCtrl.removeChip(scope.chip, scope.$index);
+                }
+                iElement.on('click', function() {
+                    deleteChip();
+                });
+                scope.$on('chip:delete', function() {
+                    deleteChip();
+                });
+            }
+        }
+    }
 })();
+
 (function() {
     angular.module('angular.chips')
         .directive('chipControl', ChipControl);
