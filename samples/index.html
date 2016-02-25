@@ -12,12 +12,24 @@
     <h4>Basic Example</h4>
     <div ng-controller="basicController as inputdemo">
         <chips ng-model="list">
-            <!-- <chips ng-model="list" render="inputdemo.updatedValue(data)"> -->
             <chip-tmpl>
                 <div class="default-chip">
                     {{chip}}
                     <span class="glyphicon glyphicon-remove" remove-chip></span>
-                    <!-- <span class="glyphicon glyphicon-remove" remove-chip="inputdemo.remove"></span> -->
+                </div>
+            </chip-tmpl>
+            <input chip-control></input>
+        </chips>
+    </div>
+    <br>
+    <h4>Custom Rendering</h4>
+    <div ng-controller="customRenderingController as custom">
+        <chips ng-model="list" render="custom.render(data)">
+            <chip-tmpl>
+                <div class="default-chip">
+                    {{chip.name}}
+                    <span>({{chip.fl}})</span>
+                    <span class="glyphicon glyphicon-remove" remove-chip="custom.deleteChip(data)"></span>
                     <!-- <div class="loader-container">
                         <i class="fa fa-spinner fa-spin fa-lg loader"></i>
                     </div> -->
@@ -26,11 +38,11 @@
             <input chip-control></input>
         </chips>
     </div>
-    <h4>Using Promise</h4>
 </body>
 <script type="text/javascript" src="/bower_components/angular/angular.js"></script>
 <script type="text/javascript" src="/dist/angular-chips.js"></script>
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="basic_example.js"></script>
+<script type="text/javascript" src="custom_rendering_example.js"></script>
 
 </html>

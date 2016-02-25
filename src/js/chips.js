@@ -12,7 +12,11 @@
             if ((error = validation(iElement)) !== undefined) {
                 throw error;
             }
-            /*addChips method should be called by input control. pls check the input_control.js*/
+            /*
+             *  @scope.chips.addChip should be called by chipControl directive or custom XXXcontrol directive developed by end user
+             *  @scope.chips.deleteChip will be called by removeChip directive
+             *
+             */
             scope.chips.addChip = function(data) {
                 var updatedData;
                 scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
@@ -23,7 +27,7 @@
                     ngModelCtrl.$setViewValue(scope.chips.list);
                 }
             };
-            /*removeChips method should be called by input control. pls check the input_control.js*/
+
             scope.chips.deleteChip = function(index) {
                 scope.chips.list.splice(index, 1);
                 ngModelCtrl.$setViewValue(scope.chips.list);
@@ -31,10 +35,6 @@
 
             ngModelCtrl.$render = function() {
                 scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
-            }
-
-            scope.chips.index = function($index) {
-                return this.list.length - $index;
             }
 
             var chipNavigate = null;
@@ -53,7 +53,8 @@
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
-            tmpl.attr('tabindex', '{{$index}}')
+            tmpl.attr('tabindex', '-1')
+            tmpl.attr('index', '{{$index+1}}')
             rootDiv.append(tmpl);
             var node = $compile(rootDiv)(scope);
             iElement.prepend(node);
@@ -83,9 +84,12 @@
                     if (event.target.nodeName === 'INPUT' && event.target.value === '') {
                         focusOnChip();
                     } else if (event.target.nodeName === 'CHIP-TMPL') {
-                        /*after*/
+                        /*
+                         * This block will be called during chip deletion using delete or Backspace key
+                         * Below code will set the focus of the next available chip
+                         */
                         var chipTemplates = iElement.find('chip-tmpl');
-                        if (chipTemplates.length > 0 && event.target.tabIndex === chipTemplates.length)
+                        if (chipTemplates.length > 0 && parseInt(event.target.getAttribute('index')) - 1 === chipTemplates.length)
                             iElement.find('chip-tmpl')[chipNavigate('ArrowLeft')].focus();
                     }
                 } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
@@ -99,7 +103,10 @@
         return {
             restrict: 'E',
             scope: {
-                /*optional callback, this will be called before rendering the data, user can modify the data before it's rendered*/
+                /*
+                 * optional callback, this will be called before rendering the data, 
+                 * user can modify the data before it's rendered
+                 */
                 render: '&?'
             },
             transclude: true,
@@ -127,36 +134,16 @@
     }
 
     function ChipsController($scope, $element, DomUtil) {
-        /*get call back method from parent scope*/
-        function getCallBack(callBack) {
-            var target = $scope.$parent;
-            if (callBack !== undefined) {
-                if (callBack.split('.').length > 1) {
-                    var levels = callBack.split('.');
-                    for (var index = 0; index < levels.length; index++) {
-                        target = target[levels[index]];
-                    }
-                } else {
-                    target = target[callBack];
-                }
-            }
-            return target;
-        }
         /*toggling input controller focus*/
         this.setFocus = function(flag) {
-                if (flag) {
-                    DomUtil($element).removeClass('chip-out-focus').addClass('chip-in-focus');
-                } else {
-                    DomUtil($element).removeClass('chip-in-focus').addClass('chip-out-focus');
-                }
+            if (flag) {
+                DomUtil($element).removeClass('chip-out-focus').addClass('chip-in-focus');
+            } else {
+                DomUtil($element).removeClass('chip-in-focus').addClass('chip-out-focus');
             }
-            /*chip will be removed if call back method return true*/
+        }
         this.removeChip = function(data, index) {
-            var callBack = getCallBack(DomUtil($element).attr('remove-chip')[0]);
-            var deleteChip = callBack !== undefined ? getCallBack(DomUtil($element).attr('remove-chip')[0])(data) : true;
-            if (deleteChip) {
-                this.deleteChip(index);
-            }
+            this.deleteChip(index);
         }
     }
 })();
