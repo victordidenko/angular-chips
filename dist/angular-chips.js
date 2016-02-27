@@ -259,10 +259,10 @@
 
                 function deleteChip() {
                     var callBack, deleteIt = true;
-                    if (iAttrs.hasOwnProperty('removeChip')) {
+                    if (iAttrs.hasOwnProperty('removeChip') && iAttrs.removeChip !== '') {
                         callBack = getCallBack(findScope(scope, iAttrs.removeChip), iAttrs.removeChip);
+                        deleteIt = callBack(scope.chip);
                     }
-                    deleteIt = callBack(scope.chip);
                     if (deleteIt)
                         chipsCtrl.removeChip(scope.chip, scope.$index);
                 };
