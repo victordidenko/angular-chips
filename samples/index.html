@@ -11,7 +11,8 @@
 <body ng-app="sample">
     <h4>Basic Example</h4>
     <div ng-controller="basicController as inputdemo">
-        <chips ng-model="list">
+    {{inputdemo.companies}}
+        <chips ng-model="inputdemo.companies">
             <chip-tmpl>
                 <div class="default-chip">
                     {{chip}}
@@ -24,15 +25,30 @@
     <br>
     <h4>Custom Rendering</h4>
     <div ng-controller="customRenderingController as custom">
-        <chips ng-model="list" render="custom.render(data)">
+    {{custom.countries}}
+        <chips ng-model="custom.countries" render="custom.render(data)">
             <chip-tmpl>
                 <div class="default-chip">
                     {{chip.name}}
                     <span>({{chip.fl}})</span>
                     <span class="glyphicon glyphicon-remove" remove-chip="custom.deleteChip(data)"></span>
-                    <!-- <div class="loader-container">
+                </div>
+            </chip-tmpl>
+            <input chip-control></input>
+        </chips>
+    </div>
+    <br>
+    <h4>Using Promise (with {Object})</h4>
+    <div ng-controller="usingPromiseController as usingPromise">
+    {{usingPromise.list}}
+        <chips defer ng-model="usingPromise.list" render="usingPromise.render(data)">
+            <chip-tmpl>
+                <div class="default-chip">
+                    {{chip.name}}
+                    <span class="glyphicon glyphicon-remove" remove-chip="custom.deleteChip(data)"></span>
+                    <div class="loader-container" ng-show="chip.isChipLoading">
                         <i class="fa fa-spinner fa-spin fa-lg loader"></i>
-                    </div> -->
+                    </div>
                 </div>
             </chip-tmpl>
             <input chip-control></input>
@@ -44,5 +60,6 @@
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="basic_example.js"></script>
 <script type="text/javascript" src="custom_rendering_example.js"></script>
+<script type="text/javascript" src="using_promise_example.js"></script>
 
 </html>

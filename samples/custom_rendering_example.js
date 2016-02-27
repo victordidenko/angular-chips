@@ -2,9 +2,9 @@
     angular.module('sample')
         .controller('customRenderingController', CustomRendering);
 
-    function CustomRendering($scope) {
+    function CustomRendering() {
         /*list of countries and it's first letter*/
-        $scope.list = [{ name: 'India', fl: 'I' }, { name: 'China', fl: 'C' }, { name: 'America', fl: 'A' }];
+        this.countries = [{ name: 'India', fl: 'I' }, { name: 'China', fl: 'C' }, { name: 'America', fl: 'A' }];
         /*call back method for chip*/
         this.render = function(val) {
             return { name: val, fl: val.charAt(0) }

@@ -30,6 +30,24 @@
         return obj && angular.isFunction(obj.then);
     }
 
+    /*
+     * update values to ngModel reference
+     */
+    function ngModel(modelCtrl) {
+        return {
+            add: function(val) {
+                var modelCopy = angular.copy(modelCtrl.$modelValue);
+                modelCopy.push(val)
+                modelCtrl.$setViewValue(modelCopy);
+            },
+            delete: function(index) {
+                var modelCopy = angular.copy(modelCtrl.$modelValue);
+                modelCopy.splice(index, 1);
+                modelCtrl.$setViewValue(modelCopy);
+            }
+        }
+    }
+
     function Chips($compile, $timeout, DomUtil) {
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
             if ((error = validation(iElement)) !== undefined) {
@@ -40,22 +58,34 @@
              *  @scope.chips.deleteChip will be called by removeChip directive
              *
              */
-            scope.chips.addChip = function(data) {
-                var updatedData;
-                scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
-                isPromiseLike(updatedData) ? updatedData.then(update) : update();
 
-                function update() {
-                    scope.chips.list.push(updatedData);
-                    ngModelCtrl.$setViewValue(scope.chips.list);
+            /*
+             * ngModel values are copies here
+             */
+            scope.chips.list;
+
+            var model = ngModel(ngModelCtrl);
+
+
+            scope.chips.addChip = function(data) {
+                var updatedData, loadingObjRef;
+                scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
+                isPromiseLike(updatedData) ? updatedData.then(update) : update(updatedData);
+
+                function update(data) {
+                    scope.chips.list.push(data);
+                    model.add(data);
                 }
             };
 
             scope.chips.deleteChip = function(index) {
                 scope.chips.list.splice(index, 1);
-                ngModelCtrl.$setViewValue(scope.chips.list);
+                model.delete(index);
             }
 
+            /*
+             * ngModel values are copied when it's updated outside
+             */
             ngModelCtrl.$render = function() {
                 scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
             }
