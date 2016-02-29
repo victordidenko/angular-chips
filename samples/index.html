@@ -38,15 +38,15 @@
         </chips>
     </div>
     <br>
-    <h4>Using Promise (with {Object})</h4>
+    <h4>Using Promise (with list of string)</h4>
     <div ng-controller="usingPromiseController as usingPromise">
     {{usingPromise.list}}
         <chips defer ng-model="usingPromise.list" render="usingPromise.render(data)">
             <chip-tmpl>
                 <div class="default-chip">
-                    {{chip.name}}
-                    <span class="glyphicon glyphicon-remove" remove-chip="custom.deleteChip(data)"></span>
-                    <div class="loader-container" ng-show="chip.isChipLoading">
+                    {{chip}}
+                    <span class="glyphicon glyphicon-remove" remove-chip="usingPromise.deleteChip(data)"></span>
+                    <div class="loader-container" ng-show="chip.isLoading">
                         <i class="fa fa-spinner fa-spin fa-lg loader"></i>
                     </div>
                 </div>

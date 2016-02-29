@@ -1,28 +1,5 @@
 (function() {
     angular.module('angular.chips', [])
-        .directive('chipTmpl', ChipTmpl);
-
-    function ChipTmpl() {
-        return {
-            restrict: 'E',
-            transclude: true,
-            link: function(scope, iElement, iAttrs, contrl, transcludefn) {
-                transcludefn(scope, function(clonedTranscludedContent) {
-                    iElement.append(clonedTranscludedContent);
-                });
-                iElement.on('keydown', function(event) {
-                    if (event.code === 'Backspace') {
-                        scope.$broadcast('chip:delete');
-                        event.preventDefault();
-                    }
-                });
-            }
-        }
-    }
-})();
-
-(function() {
-    angular.module('angular.chips')
         .directive('chips', Chips)
         .controller('chipsController', ChipsController);
 
@@ -48,11 +25,37 @@
         }
     }
 
+    function deferChip(data, promise) {
+        var defer = {};
+
+        defer.data = data;
+        defer.isLoading = false;
+        defer.isFailed = false;
+
+        if (promise) {
+            defer.isLoading = true;
+            promise.then(function(data) {
+                defer.data = data;
+                defer.isLoading = false;
+            }, function() {
+                defer.isLoading = false;
+                defer.isFailed = true;
+            });
+        }
+
+        return defer;
+    }
+
     function Chips($compile, $timeout, DomUtil) {
+
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
             if ((error = validation(iElement)) !== undefined) {
                 throw error;
             }
+
+            var model = ngModel(ngModelCtrl);
+            var isDeferFlow = iAttrs.hasOwnProperty('defer');
+
             /*
              *  @scope.chips.addChip should be called by chipControl directive or custom XXXcontrol directive developed by end user
              *  @scope.chips.deleteChip will be called by removeChip directive
@@ -64,13 +67,21 @@
              */
             scope.chips.list;
 
-            var model = ngModel(ngModelCtrl);
-
 
             scope.chips.addChip = function(data) {
-                var updatedData, loadingObjRef;
+                var updatedData;
                 scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
-                isPromiseLike(updatedData) ? updatedData.then(update) : update(updatedData);
+                // isPromiseLike(updatedData) ? deferChip(updatedData).update(data) : update(updatedData);
+
+                if (isPromiseLike(updatedData)) {
+                    updatedData.then(function(response) {
+                        model.add(response);
+                    });
+                    scope.chips.list.push(deferChip(data, updatedData));
+                    scope.$apply();
+                } else {
+                    update(updatedData);
+                }
 
                 function update(data) {
                     scope.chips.list.push(data);
@@ -79,7 +90,9 @@
             };
 
             scope.chips.deleteChip = function(index) {
-                scope.chips.list.splice(index, 1);
+                var deletedChip = scope.chips.list.splice(index, 1);
+                if (typeof deletedChip !== 'string' && deletedChip.isFailed)
+                    return;
                 model.delete(index);
             }
 
@@ -87,7 +100,17 @@
              * ngModel values are copied when it's updated outside
              */
             ngModelCtrl.$render = function() {
-                scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
+                if (isDeferFlow) {
+                    var index, list = [];
+                    for (index = 0; index < ngModelCtrl.$modelValue.length; index++) {
+                        // list.push(ngModelCtrl.$modelValue[index]);
+                        list.push(deferChip(ngModelCtrl.$modelValue[index]))
+                    }
+                    scope.chips.list = list;
+                } else {
+                    scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
+                }
+
             }
 
             var chipNavigate = null;
@@ -102,10 +125,17 @@
                     return index;
                 }
             }
-            /*Below code will extract the chip-tmpl and compile inside the chips directive scope*/
+
+            /*Extract the chip-tmpl and compile inside the chips directive scope*/
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
+            var chipTextNode, chipBindedData, chipBindedDataSuffix;
+
+            if (isDeferFlow)
+                DomUtil(tmpl).attachDataObjToTextNode();
+
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
+            tmpl.attr('ng-class', '{\'chip-failed\':chip.isFailed}')
             tmpl.attr('tabindex', '-1')
             tmpl.attr('index', '{{$index+1}}')
             rootDiv.append(tmpl);
@@ -203,51 +233,52 @@
 
 (function() {
     angular.module('angular.chips')
-        .factory('DomUtil', function() {
-            return DomUtil;
+        .directive('chipControl', ChipControl);
+
+    function ChipControl() {
+        return {
+            restrict: 'A',
+            require: '^chips',
+            link: ChipControlLinkFun,
+        }
+    };
+
+    function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
+        iElement.on('keypress', function(event) {
+            if (event.keyIdentifier === 'Enter') {
+                chipsCtrl.addChip(event.target.value);
+                event.target.value = "";
+            }
         });
-    /*Dom related functionality*/
-    function DomUtil(element) {
-        /*
-         * addclass will append class to the given element
-         * ng-class will do the same functionality, in our case
-         * we don't have access to scope so we are using this util methods
-         */
-        var utilObj = {};
+        iElement.on('focusin', function() {
+            chipsCtrl.setFocus(true);
+        });
+        iElement.on('focusout', function() {
+            chipsCtrl.setFocus(false);
+        });
+    };
+})();
 
-        utilObj.addClass = function(className) {
-            utilObj.removeClass(element, className);
-            element.attr('class', element.attr('class') + ' ' + className);
-            return utilObj;
-        };
+(function() {
+    angular.module('angular.chips')
+        .directive('chipTmpl', ChipTmpl);
 
-        utilObj.removeClass = function(className) {
-            var classes = element.attr('class').split(' ');
-            var classIndex = classes.indexOf(className);
-            if (classIndex !== -1) {
-                classes.splice(classIndex, 1);
+    function ChipTmpl() {
+        return {
+            restrict: 'E',
+            transclude: true,
+            link: function(scope, iElement, iAttrs, contrl, transcludefn) {
+                transcludefn(scope, function(clonedTranscludedContent) {
+                    iElement.append(clonedTranscludedContent);
+                });
+                iElement.on('keydown', function(event) {
+                    if (event.code === 'Backspace') {
+                        scope.$broadcast('chip:delete');
+                        event.preventDefault();
+                    }
+                });
             }
-            element.attr('class', classes.join(' '));
-            return utilObj;
-        };
-
-        utilObj.attr = function(attrName) {
-            function hasAttribute(element, attrName) {
-                var result = element.attr(attrName)
-                if (result !== undefined)
-                    return result
-
-                if (element.children().length > 0) {
-                    return hasAttribute(element.children(), attrName);
-                } else {
-                    return result;
-                }
-            }
-
-            return angular.extend([hasAttribute(element, attrName)], utilObj);
-        };
-
-        return utilObj;
+        }
     }
 })();
 
@@ -288,6 +319,8 @@
                 };
 
                 function deleteChip() {
+                    if (typeof scope.chip !== 'string' && scope.chip.isLoading)
+                        return;
                     var callBack, deleteIt = true;
                     if (iAttrs.hasOwnProperty('removeChip') && iAttrs.removeChip !== '') {
                         callBack = getCallBack(findScope(scope, iAttrs.removeChip), iAttrs.removeChip);
@@ -312,40 +345,110 @@
 
 (function() {
     angular.module('angular.chips')
-        .directive('chipControl', ChipControl);
+        .factory('DomUtil', function() {
+            return DomUtil;
+        });
+    /*Dom related functionality*/
+    function DomUtil(element) {
+        /*
+         * addclass will append class to the given element
+         * ng-class will do the same functionality, in our case
+         * we don't have access to scope so we are using this util methods
+         */
+        var utilObj = {};
 
-    function ChipControl() {
-        return {
-            restrict: 'A',
-            require: '^chips',
-            link: ChipControlLinkFun,
-        }
-    };
+        utilObj.addClass = function(className) {
+            utilObj.removeClass(element, className);
+            element.attr('class', element.attr('class') + ' ' + className);
+            return utilObj;
+        };
 
-    function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
-        iElement.on('keypress', function(event) {
-            if (event.keyIdentifier === 'Enter') {
-                chipsCtrl.addChip(event.target.value);
-                event.target.value = "";
+        utilObj.removeClass = function(className) {
+            var classes = element.attr('class').split(' ');
+            var classIndex = classes.indexOf(className);
+            if (classIndex !== -1) {
+                classes.splice(classIndex, 1);
             }
-        });
-        iElement.on('focusin', function() {
-            chipsCtrl.setFocus(true);
-        });
-        iElement.on('focusout', function() {
-            chipsCtrl.setFocus(false);
-        });
-    };
-})();
+            element.attr('class', classes.join(' '));
+            return utilObj;
+        };
 
-(function(module) {
-try { module = angular.module("angular.chips"); }
-catch(err) { module = angular.module("angular.chips", []); }
-module.run(["$templateCache", function($templateCache) {
-  "use strict";
-  $templateCache.put("src/templates/chip.tmpl.html",
-    "<!-- <div ng-transclude ng-repeat=\"name in chips.list\"> -->\n" +
-    "<div ng-transclude>\n" +
-    "</div>");
-}]);
+        /*
+         * for defer flow '<chips defer' 
+         * attaching data to binded string 
+         *
+         * example:
+         *
+         *  <chips defer>
+         *   <chip-tmpl>
+         *   {{chip}}
+         *  </chip-tmpl>
+         *  </chips>
+
+         *  will become
+         *
+         *   <chips defer>
+         *   <chip-tmpl>
+         *   {{chip.data}}
+         *   </chip-tmpl>
+         *  </chips>           
+
+         *  And
+         *
+         *  <chips defer>
+         *   <chip-tmpl>
+         *   {{chip.firstName}}
+         *  {{chip.lastName}}
+         *  </chip-tmpl>
+         *  </chips>
+
+         *  will become
+         *
+         *  <chips defer>
+         *  <chip-tmpl>
+         *   {{chip.data.firstName}}
+         *   {{chip.data.lastName}}
+         *   </chip-tmpl>
+         *  </chips>
+         */
+        utilObj.attachDataObjToTextNode = function() {
+            var textNode, bindedData, bindedDataSuffix;
+            var textNode = getChipTextNode(element);
+            if (textNode !== null) {
+                bindedData = textNode.data.trim();
+                bindedData = bindedData.substr(2, bindedData.length - 4);
+                if (bindedData === 'chip') {
+                    bindedData = bindedData + '.data';
+                } else {
+                    bindedDataSuffix = bindedData.substr(4);
+                    bindedData = 'chip' + bindedDataSuffix;
+                }
+                textNode.data = '{{' + bindedData + '}}';
+            }
+        };
+
+        function getChipTextNode(element) {
+            var contents = element.contents(),
+                index = 0,
+                result = null;
+            for (index = 0; index < contents.length; index++) {
+                if (contents[index].toString() === '[object Text]' && contents[index].data.trim().indexOf('{{chip') !== -1) {
+                    result = contents[index];
+                    break;
+                }
+            }
+
+            if (result !== null)
+                return result;
+
+            var childIndex = 0;
+            if (element.children().length > 0) {
+                return getChipTextNode(element.children());
+            }
+
+            return null;
+        };
+
+        return utilObj;
+    }
 })();

@@ -1,5 +1,5 @@
 (function() {
-    angular.module('angular.chips', [])
+    angular.module('angular.chips')
         .directive('chipTmpl', ChipTmpl);
 
     function ChipTmpl() {

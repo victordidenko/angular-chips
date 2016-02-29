@@ -13,7 +13,7 @@ gulp.task('build', function() {
 })
 
 gulp.task('concat', function() {
-    return gulp.src(['src/js/**/*.js', 'dist/template.js'])
+    return gulp.src(['src/js/directives/chips.js','src/js/**/*.js', 'dist/template.js'])
         .pipe(concat('angular-chips.js'))
         .pipe(gulp.dest('dist/'))
         .pipe(connect.reload());

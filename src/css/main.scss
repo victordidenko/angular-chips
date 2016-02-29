@@ -1,6 +1,7 @@
 $default-color: rgb(224, 224, 224);
 $focus-color: rgb(16, 108, 200);
 $chip-tmpl-focus-color: rgb(158, 158, 158);
+
 chip-tmpl {
     display: inline-block;
     margin: 0 5px 5px 0;
@@ -19,6 +20,12 @@ chip-tmpl:focus {
         border: 2px solid $chip-tmpl-focus-color;
         background: $chip-tmpl-focus-color;
         color: white;
+    }
+}
+
+.chip-failed {
+    .default-chip {
+        color: red;
     }
 }
 

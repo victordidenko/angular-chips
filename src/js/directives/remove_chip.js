@@ -35,6 +35,8 @@
                 };
 
                 function deleteChip() {
+                    if (typeof scope.chip !== 'string' && scope.chip.isLoading)
+                        return;
                     var callBack, deleteIt = true;
                     if (iAttrs.hasOwnProperty('removeChip') && iAttrs.removeChip !== '') {
                         callBack = getCallBack(findScope(scope, iAttrs.removeChip), iAttrs.removeChip);
