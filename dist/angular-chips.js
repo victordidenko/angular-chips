@@ -21,29 +21,38 @@
                 var modelCopy = angular.copy(modelCtrl.$modelValue);
                 modelCopy.splice(index, 1);
                 modelCtrl.$setViewValue(modelCopy);
+            },
+            deleteByValue: function(val) {
+                var index, resultIndex;
+                for (index = 0; index < modelCtrl.$modelValue.length; index++) {
+                    if (modelCtrl.$modelValue[index] === val) {
+                        resultIndex = index;
+                        break;
+                    }
+
+                }
+                if (resultIndex !== undefined)
+                    this.delete(resultIndex)
             }
         }
     }
 
-    function deferChip(data, promise) {
-        var defer = {};
-
-        defer.data = data;
-        defer.isLoading = false;
-        defer.isFailed = false;
+    function DeferChip(data, promise) {
+        var self = this;
+        this.data = data;
+        this.isLoading = false;
+        this.isFailed = false;
 
         if (promise) {
-            defer.isLoading = true;
+            self.isLoading = true;
             promise.then(function(data) {
-                defer.data = data;
-                defer.isLoading = false;
+                self.data = data;
+                self.isLoading = false;
             }, function() {
-                defer.isLoading = false;
-                defer.isFailed = true;
+                self.isLoading = false;
+                self.isFailed = true;
             });
         }
-
-        return defer;
     }
 
     function Chips($compile, $timeout, DomUtil) {
@@ -77,7 +86,7 @@
                     updatedData.then(function(response) {
                         model.add(response);
                     });
-                    scope.chips.list.push(deferChip(data, updatedData));
+                    scope.chips.list.push(new DeferChip(data, updatedData));
                     scope.$apply();
                 } else {
                     update(updatedData);
@@ -90,10 +99,13 @@
             };
 
             scope.chips.deleteChip = function(index) {
-                var deletedChip = scope.chips.list.splice(index, 1);
-                if (typeof deletedChip !== 'string' && deletedChip.isFailed)
+                var deletedChip = scope.chips.list.splice(index, 1)[0];
+                if (deletedChip.isFailed) {
+                    scope.$apply();
                     return;
-                model.delete(index);
+                }
+
+                deletedChip instanceof DeferChip ? model.deleteByValue(deletedChip.data) : model.delete(index);                
             }
 
             /*
@@ -104,7 +116,7 @@
                     var index, list = [];
                     for (index = 0; index < ngModelCtrl.$modelValue.length; index++) {
                         // list.push(ngModelCtrl.$modelValue[index]);
-                        list.push(deferChip(ngModelCtrl.$modelValue[index]))
+                        list.push(new DeferChip(ngModelCtrl.$modelValue[index]))
                     }
                     scope.chips.list = list;
                 } else {
