@@ -39,16 +39,18 @@
 
     function DeferChip(data, promise) {
         var self = this;
-        this.data = data;
+        this.type = 'defer';
+        this.defer = data;
         this.isLoading = false;
         this.isFailed = false;
 
         if (promise) {
             self.isLoading = true;
             promise.then(function(data) {
-                self.data = data;
+                self.defer = data;
                 self.isLoading = false;
-            }, function() {
+            }, function(data) {
+                self.defer = data;
                 self.isLoading = false;
                 self.isFailed = true;
             });
@@ -105,7 +107,7 @@
                     return;
                 }
 
-                deletedChip instanceof DeferChip ? model.deleteByValue(deletedChip.data) : model.delete(index);                
+                deletedChip instanceof DeferChip ? model.deleteByValue(deletedChip.defer) : model.delete(index);                
             }
 
             /*
@@ -142,10 +144,6 @@
             var rootDiv = angular.element('<div></div>');
             var tmpl = iElement.find('chip-tmpl').remove();
             var chipTextNode, chipBindedData, chipBindedDataSuffix;
-
-            if (isDeferFlow)
-                DomUtil(tmpl).attachDataObjToTextNode();
-
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
             tmpl.attr('ng-class', '{\'chip-failed\':chip.isFailed}')
             tmpl.attr('tabindex', '-1')

@@ -5,7 +5,7 @@
     <link rel="stylesheet" type="text/css" href="/dist/main.css">
     <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/bower_components/components-font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" type="text/css" href="input_demo.css">
+    <link rel="stylesheet" type="text/css" href="samples.css">
 </head>
 
 <body ng-app="sample">
@@ -39,13 +39,31 @@
     </div>
     <br>
     <h4>Using Promise (with list of string)</h4>
-    <div ng-controller="usingPromiseController as usingPromise">
+    <div ng-controller="usingPromiseStrController as usingPromise">
     {{usingPromise.list}}
         <chips defer ng-model="usingPromise.list" render="usingPromise.render(data)">
             <chip-tmpl>
                 <div class="default-chip">
-                    {{chip}}
+                    {{chip.defer}}
                     <span class="glyphicon glyphicon-remove" remove-chip="usingPromise.deleteChip(data)"></span>
+                    <div class="loader-container" ng-show="chip.isLoading">
+                        <i class="fa fa-spinner fa-spin fa-lg loader"></i>
+                    </div>
+                </div>
+            </chip-tmpl>
+            <input chip-control></input>
+        </chips>
+    </div>
+    <br>
+    <h4>Using Promise (with list of object)</h4>
+    <div ng-controller="usingPromiseObjController as usingPromiseObj">
+    {{usingPromiseObj.countries}}
+        <chips defer ng-model="usingPromiseObj.countries" render="usingPromiseObj.render(data)">
+            <chip-tmpl>
+                <div class="default-chip">
+                    {{chip.isLoading ? chip.defer : chip.defer.name}}
+                    <span ng-hide="chip.isLoading">({{chip.defer.fl}})</span>
+                    <span class="glyphicon glyphicon-remove" remove-chip="usingPromiseObj.deleteChip(data)"></span>
                     <div class="loader-container" ng-show="chip.isLoading">
                         <i class="fa fa-spinner fa-spin fa-lg loader"></i>
                     </div>
@@ -60,6 +78,7 @@
 <script type="text/javascript" src="app.js"></script>
 <script type="text/javascript" src="basic_example.js"></script>
 <script type="text/javascript" src="custom_rendering_example.js"></script>
-<script type="text/javascript" src="using_promise_example.js"></script>
+<script type="text/javascript" src="using_promise_str_example.js"></script>
+<script type="text/javascript" src="using_promise_obj_example.js"></script>
 
 </html>

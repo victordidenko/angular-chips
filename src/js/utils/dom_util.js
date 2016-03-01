@@ -67,8 +67,26 @@
          *  </chips>
          */
         utilObj.attachDataObjToTextNode = function() {
-            var textNode, bindedData, bindedDataSuffix;
-            var textNode = getChipTextNode(element);
+            // var textNode, bindedData, bindedDataSuffix;
+            // var textNode = getChipTextNode(element);
+            // if (textNode !== null) {
+            //     bindedData = textNode.data.trim();
+            //     bindedData = bindedData.substr(2, bindedData.length - 4);
+            //     if (bindedData === 'chip') {
+            //         bindedData = bindedData + '.data';
+            //     } else {
+            //         bindedDataSuffix = bindedData.substr(4);
+            //         bindedData = 'chip' + bindedDataSuffix;
+            //     }
+            //     textNode.data = '{{' + bindedData + '}}';
+            // }
+
+            var textNodes = getChipTextNode(element);
+            angular.forEach(textNodes, attachDataObj);
+        };
+
+        function attachDataObj(textNode) {
+            var bindedData, bindedDataSuffix;
             if (textNode !== null) {
                 bindedData = textNode.data.trim();
                 bindedData = bindedData.substr(2, bindedData.length - 4);
@@ -80,28 +98,25 @@
                 }
                 textNode.data = '{{' + bindedData + '}}';
             }
-        };
+        }
 
-        function getChipTextNode(element) {
+        function getChipTextNode(element, collection) {
             var contents = element.contents(),
                 index = 0,
-                result = null;
+                childIndex = 0,
+                result = collection || [];
+
             for (index = 0; index < contents.length; index++) {
                 if (contents[index].toString() === '[object Text]' && contents[index].data.trim().indexOf('{{chip') !== -1) {
-                    result = contents[index];
-                    break;
+                    result.push(contents[index]);
                 }
             }
 
-            if (result !== null)
-                return result;
-
-            var childIndex = 0;
             if (element.children().length > 0) {
-                return getChipTextNode(element.children());
+                getChipTextNode(element.children(), result);
             }
 
-            return null;
+            return result;
         };
 
         return utilObj;

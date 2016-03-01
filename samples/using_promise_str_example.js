@@ -1,8 +1,8 @@
 (function() {
     angular.module('sample')
-        .controller('usingPromiseController', UsingPromiseController);
+        .controller('usingPromiseStrController', UsingPromiseStrController);
 
-    function UsingPromiseController($scope, $q) {
+    function UsingPromiseStrController($scope, $q) {
         var self = this;
         self.list = ['orange', 'apple', 'grapes'];
         /*call back method for chip*/
