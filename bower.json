@@ -20,10 +20,11 @@
     "tests"
   ],
   "devDependencies": {
-    "angular": "~1.4.8",
-    "components-font-awesome": "~4.5.0"
+    "components-font-awesome": "~4.5.0",
+    "angular-bootstrap": "~1.2.1",
+    "bootstrap": "~3.3.6"
   },
   "dependencies": {
-    "bootstrap": "~3.3.6"
+    "angular": "~1.4.8",
   }
 }

@@ -1,3 +1,3 @@
 (function() {
-	angular.module('sample',['angular.chips']);
+	angular.module('sample',['angular.chips','ui.bootstrap']);
 })();

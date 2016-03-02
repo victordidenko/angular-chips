@@ -34,12 +34,12 @@ chips {
     padding: 5px;
     > div {
         display: inline;
-        > input[chip-control] {
+        > input[focus-control] {
             height: 100%;
             border: none;
             font-size: 14px;
         }
-        > input[chip-control]:focus {
+        > input[focus-control]:focus {
             outline: none;
         }
     }
