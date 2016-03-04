@@ -2,6 +2,10 @@
     angular.module('angular.chips')
         .directive('chipControl', ChipControl);
 
+    /*
+     * It's for normal input element 
+     * It send the value to chips directive when press the enter button
+     */
     function ChipControl() {
         return {
             restrict: 'A',

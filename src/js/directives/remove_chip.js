@@ -1,7 +1,11 @@
 (function() {
     angular.module('angular.chips')
         .directive('removeChip', RemoveChip);
-
+    /*
+     *  Will remove the chip
+     *  remove-chip="callback(chip)"> call back will be triggered before remove
+     *  Call back method should return true to remove or false for nothing
+     */
     function RemoveChip() {
         return {
             restrict: 'A',
@@ -35,6 +39,7 @@
                 };
 
                 function deleteChip() {
+                    // don't delete the chip which is loading
                     if (typeof scope.chip !== 'string' && scope.chip.isLoading)
                         return;
                     var callBack, deleteIt = true;

@@ -290,6 +290,10 @@
     angular.module('angular.chips')
         .directive('chipControl', ChipControl);
 
+    /*
+     * It's for normal input element 
+     * It send the value to chips directive when press the enter button
+     */
     function ChipControl() {
         return {
             restrict: 'A',
@@ -306,6 +310,31 @@
             }
         });
     };
+})();
+
+(function() {
+    angular.module('angular.chips')
+        .directive('typeaheadControl', TypeaheadControl);
+
+    /*
+     * It's for bootstrap typeahead component to pass the value to chips directive
+     */
+    function TypeaheadControl() {
+        return {
+            restrict: 'A',
+            require: ['ngModel', '^chips'],
+            link: function(scope, iElement, iAttrs, controller) {
+                var ngModelCtrl = controller[0],
+                    chipsCtrl = controller[1];
+                ngModelCtrl.$render = function() {
+                    if (!ngModelCtrl.$modelValue)
+                        return;
+                    chipsCtrl.addChip(ngModelCtrl.$modelValue);
+                    event.target.value = "";
+                }
+            }
+        }
+    }
 })();
 
 (function() {
@@ -334,7 +363,11 @@
 (function() {
     angular.module('angular.chips')
         .directive('removeChip', RemoveChip);
-
+    /*
+     *  Will remove the chip
+     *  remove-chip="callback(chip)"> call back will be triggered before remove
+     *  Call back method should return true to remove or false for nothing
+     */
     function RemoveChip() {
         return {
             restrict: 'A',
@@ -368,6 +401,7 @@
                 };
 
                 function deleteChip() {
+                    // don't delete the chip which is loading
                     if (typeof scope.chip !== 'string' && scope.chip.isLoading)
                         return;
                     var callBack, deleteIt = true;
@@ -420,97 +454,6 @@
             }
             element.attr('class', classes.join(' '));
             return utilObj;
-        };
-
-        /*
-         * for defer flow '<chips defer' 
-         * attaching data to binded string 
-         *
-         * example:
-         *
-         *  <chips defer>
-         *   <chip-tmpl>
-         *   {{chip}}
-         *  </chip-tmpl>
-         *  </chips>
-
-         *  will become
-         *
-         *   <chips defer>
-         *   <chip-tmpl>
-         *   {{chip.data}}
-         *   </chip-tmpl>
-         *  </chips>           
-
-         *  And
-         *
-         *  <chips defer>
-         *   <chip-tmpl>
-         *   {{chip.firstName}}
-         *  {{chip.lastName}}
-         *  </chip-tmpl>
-         *  </chips>
-
-         *  will become
-         *
-         *  <chips defer>
-         *  <chip-tmpl>
-         *   {{chip.data.firstName}}
-         *   {{chip.data.lastName}}
-         *   </chip-tmpl>
-         *  </chips>
-         */
-        utilObj.attachDataObjToTextNode = function() {
-            // var textNode, bindedData, bindedDataSuffix;
-            // var textNode = getChipTextNode(element);
-            // if (textNode !== null) {
-            //     bindedData = textNode.data.trim();
-            //     bindedData = bindedData.substr(2, bindedData.length - 4);
-            //     if (bindedData === 'chip') {
-            //         bindedData = bindedData + '.data';
-            //     } else {
-            //         bindedDataSuffix = bindedData.substr(4);
-            //         bindedData = 'chip' + bindedDataSuffix;
-            //     }
-            //     textNode.data = '{{' + bindedData + '}}';
-            // }
-
-            var textNodes = getChipTextNode(element);
-            angular.forEach(textNodes, attachDataObj);
-        };
-
-        function attachDataObj(textNode) {
-            var bindedData, bindedDataSuffix;
-            if (textNode !== null) {
-                bindedData = textNode.data.trim();
-                bindedData = bindedData.substr(2, bindedData.length - 4);
-                if (bindedData === 'chip') {
-                    bindedData = bindedData + '.data';
-                } else {
-                    bindedDataSuffix = bindedData.substr(4);
-                    bindedData = 'chip' + bindedDataSuffix;
-                }
-                textNode.data = '{{' + bindedData + '}}';
-            }
-        }
-
-        function getChipTextNode(element, collection) {
-            var contents = element.contents(),
-                index = 0,
-                childIndex = 0,
-                result = collection || [];
-
-            for (index = 0; index < contents.length; index++) {
-                if (contents[index].toString() === '[object Text]' && contents[index].data.trim().indexOf('{{chip') !== -1) {
-                    result.push(contents[index]);
-                }
-            }
-
-            if (element.children().length > 0) {
-                getChipTextNode(element.children(), result);
-            }
-
-            return result;
         };
 
         return utilObj;
