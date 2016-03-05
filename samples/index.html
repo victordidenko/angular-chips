@@ -113,7 +113,7 @@
                     <span class="glyphicon glyphicon-remove" remove-chip></span>
                 </div>
             </chip-tmpl>
-            <input typeahead-control ng-model="typeaheadmodel" uib-typeahead="company for company in typeahead.availableCompanies | filter:$viewValue"></input>
+            <input ng-model-control ng-model="typeaheadmodel" uib-typeahead="company for company in typeahead.availableCompanies | filter:$viewValue"></input>
         </chips>
         <!-- Printing controller value -->
         <div class="printvalue">

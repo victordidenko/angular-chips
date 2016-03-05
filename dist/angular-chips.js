@@ -151,8 +151,6 @@
             rootDiv.append(tmpl);
             var node = $compile(rootDiv)(scope);
             iElement.prepend(node);
-            var inputNode = iElement.find('input');
-            inputNode.attr('focusControl');
 
 
             /*clicking on chips element should set the focus on INPUT*/
@@ -314,12 +312,13 @@
 
 (function() {
     angular.module('angular.chips')
-        .directive('typeaheadControl', TypeaheadControl);
+        .directive('ngModelControl', NGModelControl);
 
     /*
-     * It's for bootstrap typeahead component to pass the value to chips directive
+     * It's for input element which uses ng-model directive
+     * example: bootstrap typeahead component
      */
-    function TypeaheadControl() {
+    function NGModelControl() {
         return {
             restrict: 'A',
             require: ['ngModel', '^chips'],

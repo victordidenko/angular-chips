@@ -1,11 +1,12 @@
 (function() {
     angular.module('angular.chips')
-        .directive('typeaheadControl', TypeaheadControl);
+        .directive('ngModelControl', NGModelControl);
 
     /*
-     * It's for bootstrap typeahead component to pass the value to chips directive
+     * It's for input element which uses ng-model directive
+     * example: bootstrap typeahead component
      */
-    function TypeaheadControl() {
+    function NGModelControl() {
         return {
             restrict: 'A',
             require: ['ngModel', '^chips'],

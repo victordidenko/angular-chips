@@ -151,8 +151,6 @@
             rootDiv.append(tmpl);
             var node = $compile(rootDiv)(scope);
             iElement.prepend(node);
-            var inputNode = iElement.find('input');
-            inputNode.attr('focusControl');
 
 
             /*clicking on chips element should set the focus on INPUT*/
