@@ -57,6 +57,20 @@
         }
     }
 
+    /*
+     * get function param key
+     * example: 'render(data)' data is the key here
+     * getParamKey('render(data)') will return data
+     */
+    function getParamKey(funStr) {
+        if (funStr === undefined)
+            return;
+        var openParenthesisIndex, closeParenthesisIndex;
+        openParenthesisIndex = funStr.indexOf('(') + 1;
+        closeParenthesisIndex = funStr.indexOf(')');
+        return funStr.substr(openParenthesisIndex, closeParenthesisIndex - openParenthesisIndex);
+    }
+
     function Chips($compile, $timeout, DomUtil) {
 
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
@@ -66,6 +80,7 @@
 
             var model = ngModel(ngModelCtrl);
             var isDeferFlow = iAttrs.hasOwnProperty('defer');
+            var functionParam = getParamKey(iAttrs.render);
 
             /*
              *  @scope.chips.addChip should be called by chipControl directive or custom XXXcontrol directive developed by end user
@@ -78,11 +93,14 @@
              */
             scope.chips.list;
 
-
             scope.chips.addChip = function(data) {
-                var updatedData;
-                scope.render !== undefined ? updatedData = scope.render({ data: data }) : updatedData = data;
-                // isPromiseLike(updatedData) ? deferChip(updatedData).update(data) : update(updatedData);
+                var updatedData, paramObj;
+
+                if (scope.render !== undefined && functionParam !== '') {
+                    paramObj = {};
+                    paramObj[functionParam] = data;
+                    updatedData = scope.render(paramObj)
+                } else { updatedData = data }
 
                 if (isPromiseLike(updatedData)) {
                     updatedData.then(function(response) {
@@ -212,11 +230,11 @@
                         transcludefn(scope.$parent, function(clonedTranscludedContent) {
                             var dive = angular.element('<div></div>');
                             var input;
-                            angular.forEach(clonedTranscludedContent,function(node){
-                                if(node.nodeName === 'INPUT')
+                            angular.forEach(clonedTranscludedContent, function(node) {
+                                if (node.nodeName === 'INPUT')
                                     input = node;
                             });
-                            input.setAttribute('focus-control','');
+                            input.setAttribute('focus-control', '');
                             dive.append(clonedTranscludedContent);
                             iElement.append(dive);
                         });
