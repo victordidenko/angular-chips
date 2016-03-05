@@ -31,8 +31,12 @@
                     return target;
                 };
 
+                /*
+                 * traverse scope hierarchy and find the scope
+                 */
                 function findScope(scope, prop) {
-                    if (!scope.hasOwnProperty(prop.split('.')[0])) {
+                    var funStr = prop.indexOf('.') !== -1 ? prop.split('.')[0] : prop.split('(')[0];
+                    if (!scope.hasOwnProperty(funStr)) {
                         return findScope(scope.$parent, prop)
                     }
                     return scope;
