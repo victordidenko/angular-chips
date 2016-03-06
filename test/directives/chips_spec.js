@@ -4,7 +4,13 @@ describe('Directive chips', function() {
 
     beforeEach(module('angular.chips'));
 
-    var element, scope, compile, template, isolateScope;
+    var element, scope, compile, template, isolateScope, timeout;
+
+    function getChipScope(index) {
+        var elements = element.find('chip-tmpl');
+        index = index > 0 ? index : (index < 0 ? elements.length - 1 : 0)
+        return angular.element(elements[index]).scope();
+    }
 
     /*** Basic flow ***/
 
@@ -75,17 +81,13 @@ describe('Directive chips', function() {
         });
 
         it('check deleting chip by passing string', function() {
-            var secondChip = angular.element(element.find('chip-tmpl')[1]);
-            var secondChipScope = secondChip.scope();
-            secondChipScope.$broadcast('chip:delete')
+            getChipScope(1).$broadcast('chip:delete')
             expect(scope.samples[1].name).not.toBe('China');
             expect(scope.samples[1].name).not.toBe('China');
         });
 
         it('check chip delete restriction', function() {
-            var firstChip = angular.element(element.find('chip-tmpl')[0]);
-            var firstChipScope = firstChip.scope();
-            firstChipScope.$broadcast('chip:delete')
+            getChipScope(0).$broadcast('chip:delete')
                 // as per logic 'India' should not delete
             expect(scope.samples[0].name).toBe('India');
         });
@@ -93,27 +95,94 @@ describe('Directive chips', function() {
 
 
     /*** Using Promise with list of string ***/
-    var timeout;
-    describe('custom rendering flow', function() {
+    describe('Using Promise with list of string', function() {
+        beforeEach(inject(function($rootScope, $injector) {
+            scope = $rootScope.$new();
+            timeout = $injector.get('$timeout');
+            scope.samples = ['orange', 'apple', 'grapes'];
+
+            scope.render = function(val) {
+                var promise = timeout(function() {
+                    return scope.samples.indexOf(val) === -1 ? val : timeout.cancel(promise)
+                }, 100);
+                return promise;
+            };
+
+            scope.deleteChip = function(obj) {
+                return true;
+            };
+
+            compile = $injector.get('$compile');
+
+            template = '<chips defer ng-model="samples" render="render(data)">' +
+                '<chip-tmpl>' +
+                '<div class="default-chip">' +
+                '{{chip.defer}}' +
+                '<span class="glyphicon glyphicon-remove" remove-chip="deleteChip(data)"></span>' +
+                '<div class="loader-container" ng-show="chip.isLoading">' +
+                '<i class="fa fa-spinner fa-spin fa-lg loader"></i>' +
+                '</div>' +
+                '</div>' +
+                '</chip-tmpl>' +
+                '<input chip-control></input>' +
+                '</chips>';
+            element = angular.element(template);
+            compile(element)(scope);
+            scope.$digest();
+            isolateScope = element.isolateScope();
+        }));
+
+        it('check chips.list values', function() {
+            expect(scope.samples.length).toEqual(isolateScope.chips.list.length);
+        });
+
+        it('check adding chip by passing string', function() {
+            isolateScope.chips.addChip('Banana');
+            timeout.flush()
+            expect(scope.samples[scope.samples.length - 1]).toBe('Banana');
+        });
+
+        /*as per render logic above, adding existing string should reject the promise*/
+        it('check adding existing chip, as per the logic adding existing string should reject the promise', function() {
+            isolateScope.chips.addChip('orange');
+            timeout.flush()
+            expect(scope.samples[scope.samples.length - 1]).not.toBe('orange');
+        });
+
+        it('check deleting chip by passing string', function() {
+            getChipScope().$broadcast('chip:delete')
+            expect(scope.samples[0].name).not.toBe('orange');
+        });
+    });
+
+
+    /*** Using Promise with list of Object ***/
+    describe('Using Promise with list of Object', function() {
         beforeEach(inject(function($rootScope, $injector) {
             scope = $rootScope.$new();
             timeout = $injector.get('$timeout');
             scope.usingPromiseObj = {};
-            scope.usingPromiseObj.samples = ['orange', 'apple', 'grapes'];
+            scope.usingPromiseObj.samples = [{ name: 'India', fl: 'I' }, { name: 'China', fl: 'C' }, { name: 'America', fl: 'A' }];
+
             scope.usingPromiseObj.render = function(val) {
-                timeout(500, function() {
-                    self.list.indexOf(val) === -1 ? deferred.resolve(val) : deferred.reject(val);
-                });
-                var deferred = q.defer();
-                setTimeout(function() {
-                    self.list.indexOf(val) === -1 ? deferred.resolve(val) : deferred.reject(val);
-                }, 0);
-                return deferred.promise;
+                var promise = timeout(handleRender, 100);
+
+                function handleRender() {
+                    if (val === 'India') {
+                        timeout.cancel(promise);
+                    } else {
+                        return { name: val, fl: val.charAt(0) };
+                    }
+                }
+                return promise;
             };
+
             scope.usingPromiseObj.deleteChip = function(obj) {
                 return true;
             };
+
             compile = $injector.get('$compile');
+
             template = '<chips defer ng-model="usingPromiseObj.samples" render="usingPromiseObj.render(data)">' +
                 '<chip-tmpl>' +
                 '<div class="default-chip">' +
@@ -138,27 +207,38 @@ describe('Directive chips', function() {
             expect(scope.usingPromiseObj.samples.length).toEqual(isolateScope.chips.list.length);
         });
 
-        // it('check adding chip by passing string', function() {
-        //     isolateScope.chips.addChip('Banana');
-        //     console.log(scope.usingPromiseObj.samples);
-        //     expect(scope.usingPromiseObj.samples[scope.usingPromiseObj.samples.length - 1]).toBe('Banana');
-        // });
+        it('check adding chip by passing string', function() {
+            isolateScope.chips.addChip('Swedan');
+            timeout.flush()
+            expect(scope.usingPromiseObj.samples[scope.usingPromiseObj.samples.length - 1].name).toBe('Swedan');
+        });
 
-        // it('check deleting chip by passing string', function() {
-        //     var secondChip = angular.element(element.find('chip-tmpl')[1]);
-        //     var secondChipScope = secondChip.scope();
-        //     secondChipScope.$broadcast('chip:delete')
-        //     expect(scope.samples[1].name).not.toBe('China');
-        //     expect(scope.samples[1].name).not.toBe('China');
-        // });
+        it('check deleting chip by passing string', function() {
+            getChipScope().$broadcast('chip:delete')
+            expect(scope.usingPromiseObj.samples[0].name).not.toBe('India');
+        });
 
-        // it('check chip delete restriction', function() {
-        //     var firstChip = angular.element(element.find('chip-tmpl')[0]);
-        //     var firstChipScope = firstChip.scope();
-        //     firstChipScope.$broadcast('chip:delete')
-        //         // as per logic 'India' should not delete
-        //     expect(scope.samples[0].name).toBe('India');
-        // });
+        it('check deleting chip while loading', function() {
+            isolateScope.chips.addChip('Canada');
+            var chipTmpls = element.find('chip-tmpl');
+            getChipScope(-1).$broadcast('chip:delete')
+            // should not delete while loading
+            expect(chipTmpls.length).toEqual(element.find('chip-tmpl').length);
+        });
+
+        it('check deleting rejected chip', function() {
+            isolateScope.chips.addChip('India');
+            //rejected chip won't get added to scope
+            expect(scope.usingPromiseObj.samples.length).toBe(3)
+            timeout.flush();
+            var duplicateChipScope = getChipScope(-1);
+            expect(duplicateChipScope.chip.isFailed).toBe(true);
+            var chipTmpls = element.find('chip-tmpl');
+            duplicateChipScope.$broadcast('chip:delete');
+            // rejected chip should get deleted from view
+            expect(chipTmpls.length-1).toEqual(element.find('chip-tmpl').length);
+        });
+
     });
 
 

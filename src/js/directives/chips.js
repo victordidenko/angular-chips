@@ -104,12 +104,10 @@
 
                 if (isPromiseLike(updatedData)) {
                     updatedData.then(function(response) {
-                        console.log('response ',response);
                         model.add(response);
                     });
                     scope.chips.list.push(new DeferChip(data, updatedData));
                     scope.$apply();
-                    console.log('applyed')
                 } else {
                     update(updatedData);
                 }
