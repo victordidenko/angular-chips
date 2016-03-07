@@ -224,26 +224,10 @@
             },
             transclude: true,
             require: 'ngModel',
-            compile: function(scope, iElement, iAttrs) {
-                return {
-                    pre: function(scope, iElement, iAttrs, mctrl, transcludefn) {
-                        transcludefn(scope.$parent, function(clonedTranscludedContent) {
-                            var dive = angular.element('<div></div>');
-                            var input;
-                            angular.forEach(clonedTranscludedContent, function(node) {
-                                if (node.nodeName === 'INPUT')
-                                    input = node;
-                            });
-                            input.setAttribute('focus-control', '');
-                            dive.append(clonedTranscludedContent);
-                            iElement.append(dive);
-                        });
-                    },
-                    post: linkFun,
-                }
-            },
+            link: linkFun,
             controller: 'chipsController',
             controllerAs: 'chips',
+            template: '<div ng-transclude></div>'
         }
 
     };

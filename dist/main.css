@@ -23,11 +23,11 @@ chips {
   padding: 5px; }
   chips > div {
     display: inline; }
-    chips > div > input[focus-control] {
+    chips > div > input {
       height: 100%;
       border: none;
       font-size: 14px; }
-    chips > div > input[focus-control]:focus {
+    chips > div > input:focus {
       outline: none; }
 
 .chip-out-focus {

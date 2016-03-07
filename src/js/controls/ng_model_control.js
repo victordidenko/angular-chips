@@ -19,6 +19,13 @@
                     chipsCtrl.addChip(ngModelCtrl.$modelValue);
                     event.target.value = "";
                 }
+
+                iElement.on('focusin', function() {
+                    chipsCtrl.setFocus(true);
+                });
+                iElement.on('focusout', function() {
+                    chipsCtrl.setFocus(false);
+                });
             }
         }
     }
