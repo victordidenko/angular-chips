@@ -181,7 +181,7 @@
                 chipNavigate = null;
             });
             /*this method will handle 'delete or Backspace' and left, right key press*/
-            iElement.on('keydown', function(event) {
+            scope.chips.handleKeyDown = function(event) {
                 if (event.target.nodeName !== 'INPUT' && event.target.nodeName !== 'CHIP-TMPL' || (iElement.find('chip-tmpl').length === 0 && event.target.value === ''))
                     return;
 
@@ -208,7 +208,9 @@
                 } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
                     chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.code)].focus();
                 }
-            });
+            };
+            
+            iElement.on('keydown', scope.chips.handleKeyDown);
 
             DomUtil(iElement).addClass('chip-out-focus');
         }

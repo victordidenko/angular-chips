@@ -17,7 +17,9 @@ module.exports = function(config) {
     files: [
     'bower_components/angular/angular.js',
     'bower_components/angular-mocks/angular-mocks.js',
-    'dist/angular-chips.js',
+    'src/js/directives/chips.js',
+    'src/js/**/*.js',
+    'test/directives/utils.js',
     'test/**/*.js'
     ],
 
@@ -30,7 +32,7 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'dist/angular-chips.js': ['coverage'],
+        'src/js/**/*.js': ['coverage'],
     },
 
      coverageReporter: {
