@@ -152,7 +152,7 @@
              */
             function chipNavigator(index) {
                 return function(direction) {
-                    direction === 'ArrowLeft' ? index-- : index++;
+                    direction === 37 ? index-- : index++;
                     index = index < 0 ? scope.chips.list.length - 1 : index > scope.chips.list.length - 1 ? 0 : index;
                     return index;
                 }
@@ -193,9 +193,10 @@
                     chipNavigate = chipNavigator(chipTmpls.length - 1);
                 }
 
-                if (event.code === 'Backspace') {
+                if (event.keyCode === 8) {
                     if (event.target.nodeName === 'INPUT' && event.target.value === '') {
                         focusOnChip();
+                        event.preventDefault();
                     } else if (event.target.nodeName === 'CHIP-TMPL') {
                         /*
                          * This block will be called during chip deletion using delete or Backspace key
@@ -203,11 +204,11 @@
                          */
                         var chipTemplates = iElement.find('chip-tmpl');
                         if (chipTemplates.length > 0 && parseInt(event.target.getAttribute('index')) - 1 === chipTemplates.length)
-                            iElement.find('chip-tmpl')[chipNavigate('ArrowLeft')].focus();
+                            iElement.find('chip-tmpl')[chipNavigate(37)].focus();
                     }
-                    event.preventDefault();
-                } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
-                    chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.code)].focus();
+
+                } else if (event.keyCode === 37 || event.keyCode === 39) {
+                    chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.keyCode)].focus();
                 }
             };
 

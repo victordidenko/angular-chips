@@ -11,7 +11,7 @@
                     iElement.append(clonedTranscludedContent);
                 });
                 iElement.on('keydown', function(event) {
-                    if (event.code === 'Backspace') {
+                    if (event.keyCode === 8) {
                         scope.$broadcast('chip:delete');
                         event.preventDefault();
                     }
