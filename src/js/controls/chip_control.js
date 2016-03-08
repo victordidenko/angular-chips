@@ -16,16 +16,16 @@
 
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
-            if (event.keyIdentifier === 'Enter') {
+            if (event.code === 'Enter') {
                 chipsCtrl.addChip(event.target.value);
                 event.target.value = "";
             }
         });
 
-        iElement.on('focusin', function() {
+        iElement.on('focus', function() {
             chipsCtrl.setFocus(true);
         });
-        iElement.on('focusout', function() {
+        iElement.on('blur', function() {
             chipsCtrl.setFocus(false);
         });
     };

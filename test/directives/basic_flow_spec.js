@@ -33,14 +33,143 @@ describe('Directive chips : Basic flow', function() {
         expect(scope.samples.indexOf('Pramati')).not.toBe(-1);
     });
 
+    it('pressing Enter key on INPUT element should add the chip',function(){
+        var inputEle = element.find('INPUT')[0];
+        inputEle.value = 'Spain';
+        var event = new Event('keypress');
+        event.code = 'Enter';
+        inputEle.dispatchEvent(event);
+        expect(scope.samples[scope.samples.length-1]).toBe('Spain');
+    });
+
     it('check deleting chip by passing string', function() {
         isolateScope.chips.deleteChip(scope.samples.indexOf('Pramati'));
         expect(scope.samples.indexOf('Pramati')).toBe(-1);
     });
 
-    fit('check keydown on chips', function() {
+    it('keydown on chips should focus on input', function() {
+        spyOn(element.find('input')[0], 'focus');
         element[0].click();
-        console.log(element[0])
+        expect(element.find('input')[0].focus).toHaveBeenCalled()
+    });
+
+    it('pressing backspace should focus on last chip', function() {
+        var event = {
+            code: 'Backspace',
+            preventDefault: angular.noop,
+            target: { nodeName: 'INPUT', value: '' }
+        };
+        var chipTmpls = element.find('chip-tmpl');
+        var lastchipTmpl = chipTmpls[chipTmpls.length - 1];
+        spyOn(lastchipTmpl, 'focus');
+        isolateScope.chips.handleKeyDown(event);
+        expect(lastchipTmpl.focus).toHaveBeenCalled();
+    });
+
+    it('keep pressing backspace should delete chip one by one and focus last one', function() {
+
+        var mockEvent = {
+            code: 'Backspace',
+            preventDefault: angular.noop,
+            target: { nodeName: 'INPUT', value: '' }
+        };
+        //set focus on last inddex chip which is Microsoft
+        isolateScope.chips.handleKeyDown(mockEvent);
+
+        var event = new Event('keydown', { bubbles: true });
+        event.code = 'Backspace';
+        //will invoke chip_tmpl keydown handler
+        var microsoftChip = getLastChipTmpl(element);
+        microsoftChip.dispatchEvent(event);
+        //checking is Microsoft removed
+        expect(angular.element(getLastChipTmpl(element)).html()).not.toContain('Microsoft')
+        expect(angular.element(getLastChipTmpl(element)).html()).toContain('Verizon')
+
+        mockEvent.target = microsoftChip;
+        spyOn(getLastChipTmpl(element), 'focus');
+        //set focus on last index chip which is Verizon
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element).focus).toHaveBeenCalled()
+
+        //focus on chip by pressing left arrow
+        mockEvent.code = 'ArrowLeft';
+        spyOn(getLastChipTmpl(element, 1), 'focus');
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element, 1).focus).toHaveBeenCalled();
+    });
+
+    it('pressing left and right arrow should focus on chips respectivly',function(){
+        //['Apple', 'Cisco', 'Verizon', 'Microsoft'];
+        //should focus on last chip when pressing left arrow
+        var ele = getLastChipTmpl(element);
+        var mockEvent = {code: 'ArrowLeft', target: ele}
+        spyOn(ele,'focus');
+        //should focus on Microsoft
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(ele.focus).toHaveBeenCalled();
+
+        //checking right arrow selection
+        //should focus on Verizon
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //should focus on Cisco
+        isolateScope.chips.handleKeyDown(mockEvent);
+        mockEvent.code = 'ArrowRight'
+        spyOn(getLastChipTmpl(element,2),'focus');
+        //shuld focus on Verizon again
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element,2).focus).toHaveBeenCalled();
+
+        //keep pressing left arrow
+        mockEvent.code = 'ArrowLeft';
+        spyOn(getLastChipTmpl(element,1),'focus');
+        //focus on Cisco
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Apple
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Microsoft
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Verizon
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Cisco
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element,1).focus).toHaveBeenCalled();        
+
+
+        //keep pressing right arrow
+        mockEvent.code = 'ArrowRight';
+        spyOn(getLastChipTmpl(element,0),'focus');
+        //focus on Verizon
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Microsoft
+        isolateScope.chips.handleKeyDown(mockEvent);
+        //focus on Apple
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element,0).focus).toHaveBeenCalled();
+
+    });
+
+    it('check focus and blur on INPUT element ',function(){
+        var focusEvent = new Event('focus')
+        expect(element.hasClass('chip-out-focus')).toBe(true);
+        element.find('INPUT')[0].dispatchEvent(focusEvent);
+        expect(element.hasClass('chip-in-focus')).toBe(true);
+
+        var blurEvent = new Event('blur');
+        element.find('INPUT')[0].dispatchEvent(blurEvent);
+        expect(element.hasClass('chip-out-focus')).toBe(true);
+    });
+
+    it('clicking on delete icon should delete chip',function(){
+        var chip = getLastChipTmpl(element);
+        angular.element(chip).find('SPAN')[0].click();
+        expect(scope.samples.length).toBe(3);
+    });
+
+    it('preventDefault should happen only if target is either INPUT or CHIP-TMPL',function(){
+        var event = {target: {}, preventDefault:angular.noop}
+        spyOn(event,'preventDefault');
+        isolateScope.chips.handleKeyDown({target:{}})
+        expect(event.preventDefault).not.toHaveBeenCalled();
     });
 
     it('missing chip-tmpl should get error', function() {
@@ -50,6 +179,18 @@ describe('Directive chips : Basic flow', function() {
             '</chips>';
         var fun = function() { compile(angular.element(str))(scope) };
         expect(fun).toThrow('should have chip-tmpl');
-    })
+    });
+
+    it('having more then one chip-tmpl should get error', function() {
+        var str = '<chips ng-model="samples">' +
+            '<chip-tmpl><div></div></chip-tmpl>'+
+            '<chip-tmpl>'+
+            '<div class="default-chip">{{chip}}<span class="glyphicon glyphicon-remove" remove-chip></span></div>' +
+            '</chip-tmpl>'+
+            '<input chip-control></input>' +
+            '</chips>';
+        var fun = function() { compile(angular.element(str))(scope) };
+        expect(fun).toThrow('should have only one chip-tmpl');
+    });
 
 });

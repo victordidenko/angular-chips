@@ -25,7 +25,7 @@
             deleteByValue: function(val) {
                 var index, resultIndex;
                 for (index = 0; index < modelCtrl.$modelValue.length; index++) {
-                    if (modelCtrl.$modelValue[index] === val) {
+                    if (angular.equals(modelCtrl.$modelValue[index], val)) {
                         resultIndex = index;
                         break;
                     }
@@ -74,7 +74,7 @@
     function Chips($compile, $timeout, DomUtil) {
 
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
-            if ((error = validation(iElement)) !== undefined) {
+            if ((error = validation(iElement)) !== '') {
                 throw error;
             }
 
@@ -177,7 +177,7 @@
                     iElement.find('input')[0].focus();
             });
             /*on every focus we need to nullify the chipNavigate*/
-            iElement.find('input').on('focusin', function() {
+            iElement.find('input').on('focus', function() {
                 chipNavigate = null;
             });
             /*this method will handle 'delete or Backspace' and left, right key press*/
@@ -205,11 +205,12 @@
                         if (chipTemplates.length > 0 && parseInt(event.target.getAttribute('index')) - 1 === chipTemplates.length)
                             iElement.find('chip-tmpl')[chipNavigate('ArrowLeft')].focus();
                     }
+                    event.preventDefault();
                 } else if (event.code === 'ArrowLeft' || event.code === 'ArrowRight') {
                     chipNavigate === null ? focusOnChip() : iElement.find('chip-tmpl')[chipNavigate(event.code)].focus();
                 }
             };
-            
+
             iElement.on('keydown', scope.chips.handleKeyDown);
 
             DomUtil(iElement).addClass('chip-out-focus');
@@ -235,17 +236,7 @@
     };
     /* <chip-tmpl> tag is mandatory added validation to confirm that*/
     function validation(element) {
-        var error;
-        if (element.find('chip-tmpl').length === 0) {
-            error = 'should have chip-tmpl';
-        } else {
-            if (element.children().length > 1) {
-                error = 'should have only one chip-tmpl';
-            } else if (element.children().length < 1) {
-                error = 'should have one chip-tmpl';
-            }
-        }
-        return error;
+        return element.find('chip-tmpl').length === 0 ? 'should have chip-tmpl' : element.find('chip-tmpl').length > 1 ? 'should have only one chip-tmpl' : '';
     }
 
     function ChipsController($scope, $element, DomUtil) {
@@ -281,16 +272,16 @@
 
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
-            if (event.keyIdentifier === 'Enter') {
+            if (event.code === 'Enter') {
                 chipsCtrl.addChip(event.target.value);
                 event.target.value = "";
             }
         });
 
-        iElement.on('focusin', function() {
+        iElement.on('focus', function() {
             chipsCtrl.setFocus(true);
         });
-        iElement.on('focusout', function() {
+        iElement.on('blur', function() {
             chipsCtrl.setFocus(false);
         });
     };
@@ -311,17 +302,17 @@
             link: function(scope, iElement, iAttrs, controller) {
                 var ngModelCtrl = controller[0],
                     chipsCtrl = controller[1];
-                ngModelCtrl.$render = function() {
+                ngModelCtrl.$render = function(event) {
                     if (!ngModelCtrl.$modelValue)
                         return;
                     chipsCtrl.addChip(ngModelCtrl.$modelValue);
-                    event.target.value = "";
+                    iElement.val('');
                 }
 
-                iElement.on('focusin', function() {
+                iElement.on('focus', function() {
                     chipsCtrl.setFocus(true);
                 });
-                iElement.on('focusout', function() {
+                iElement.on('blur', function() {
                     chipsCtrl.setFocus(false);
                 });
             }

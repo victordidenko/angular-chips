@@ -13,17 +13,17 @@
             link: function(scope, iElement, iAttrs, controller) {
                 var ngModelCtrl = controller[0],
                     chipsCtrl = controller[1];
-                ngModelCtrl.$render = function() {
+                ngModelCtrl.$render = function(event) {
                     if (!ngModelCtrl.$modelValue)
                         return;
                     chipsCtrl.addChip(ngModelCtrl.$modelValue);
-                    event.target.value = "";
+                    iElement.val('');
                 }
 
-                iElement.on('focusin', function() {
+                iElement.on('focus', function() {
                     chipsCtrl.setFocus(true);
                 });
-                iElement.on('focusout', function() {
+                iElement.on('blur', function() {
                     chipsCtrl.setFocus(false);
                 });
             }
