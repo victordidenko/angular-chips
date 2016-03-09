@@ -262,73 +262,6 @@
 })();
 
 (function() {
-    ChipControlLinkFun.$inject = ["scope", "iElement", "iAttrs", "chipsCtrl"];
-    angular.module('angular.chips')
-        .directive('chipControl', ChipControl);
-
-    /*
-     * It's for normal input element
-     * It send the value to chips directive when press the enter button
-     */
-    function ChipControl() {
-        return {
-            restrict: 'A',
-            require: '^chips',
-            link: ChipControlLinkFun,
-        }
-    };
-    /*@ngInject*/
-    function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
-        iElement.on('keypress', function(event) {
-            if (event.keyCode === 13 && event.target.value !== '') {
-                chipsCtrl.addChip(event.target.value);
-                event.target.value = "";
-            }
-        });
-
-        iElement.on('focus', function() {
-            chipsCtrl.setFocus(true);
-        });
-        iElement.on('blur', function() {
-            chipsCtrl.setFocus(false);
-        });
-    };
-})();
-
-(function() {
-    angular.module('angular.chips')
-        .directive('ngModelControl', NGModelControl);
-
-    /*
-     * It's for input element which uses ng-model directive
-     * example: bootstrap typeahead component
-     */
-    function NGModelControl() {
-        return {
-            restrict: 'A',
-            require: ['ngModel', '^chips'],
-            link: function(scope, iElement, iAttrs, controller) {
-                var ngModelCtrl = controller[0],
-                    chipsCtrl = controller[1];
-                ngModelCtrl.$render = function(event) {
-                    if (!ngModelCtrl.$modelValue)
-                        return;
-                    chipsCtrl.addChip(ngModelCtrl.$modelValue);
-                    iElement.val('');
-                }
-
-                iElement.on('focus', function() {
-                    chipsCtrl.setFocus(true);
-                });
-                iElement.on('blur', function() {
-                    chipsCtrl.setFocus(false);
-                });
-            }
-        }
-    }
-})();
-
-(function() {
     angular.module('angular.chips')
         .directive('chipTmpl', ChipTmpl);
 
@@ -452,5 +385,72 @@
         };
 
         return utilObj;
+    }
+})();
+
+(function() {
+    ChipControlLinkFun.$inject = ["scope", "iElement", "iAttrs", "chipsCtrl"];
+    angular.module('angular.chips')
+        .directive('chipControl', ChipControl);
+
+    /*
+     * It's for normal input element
+     * It send the value to chips directive when press the enter button
+     */
+    function ChipControl() {
+        return {
+            restrict: 'A',
+            require: '^chips',
+            link: ChipControlLinkFun,
+        }
+    };
+    /*@ngInject*/
+    function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
+        iElement.on('keypress', function(event) {
+            if (event.keyCode === 13 && event.target.value !== '') {
+                chipsCtrl.addChip(event.target.value);
+                event.target.value = "";
+            }
+        });
+
+        iElement.on('focus', function() {
+            chipsCtrl.setFocus(true);
+        });
+        iElement.on('blur', function() {
+            chipsCtrl.setFocus(false);
+        });
+    };
+})();
+
+(function() {
+    angular.module('angular.chips')
+        .directive('ngModelControl', NGModelControl);
+
+    /*
+     * It's for input element which uses ng-model directive
+     * example: bootstrap typeahead component
+     */
+    function NGModelControl() {
+        return {
+            restrict: 'A',
+            require: ['ngModel', '^chips'],
+            link: function(scope, iElement, iAttrs, controller) {
+                var ngModelCtrl = controller[0],
+                    chipsCtrl = controller[1];
+                ngModelCtrl.$render = function(event) {
+                    if (!ngModelCtrl.$modelValue)
+                        return;
+                    chipsCtrl.addChip(ngModelCtrl.$modelValue);
+                    iElement.val('');
+                }
+
+                iElement.on('focus', function() {
+                    chipsCtrl.setFocus(true);
+                });
+                iElement.on('blur', function() {
+                    chipsCtrl.setFocus(false);
+                });
+            }
+        }
     }
 })();
