@@ -20,8 +20,8 @@ module.exports = function(config) {
     'bower_components/angular-mocks/angular-mocks.js',
     'src/js/directives/chips.js',
     'src/js/**/*.js',
-    'test/directives/utils.js',
-    'test/**/*.js'
+    'test/utils.js',
+    'test/*.js'
     ],
 
 

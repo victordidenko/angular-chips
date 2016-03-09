@@ -1,1 +1,3 @@
-It's Angular UI component. Use full for single and multiple selection.
+# Angular-Chips
+
+Angular-Chips is the angular based component. You can use it to add dynamic chips or label.
