@@ -188,9 +188,12 @@
                 var chipTmpls;
 
                 function focusOnChip() {
+                    var index = parseInt(document.activeElement.getAttribute('index')) || (chipTmpls = iElement.find('chip-tmpl')).length;
                     chipTmpls = iElement.find('chip-tmpl');
-                    chipTmpls[chipTmpls.length - 1].focus();
-                    chipNavigate = chipNavigator(chipTmpls.length - 1);
+                    chipTmpls[index - 1].focus();
+                    chipNavigate = chipNavigator(index-1);
+                    if(event.target.nodeName !== 'INPUT')
+                        chipTmpls[chipNavigate(event.keyCode)].focus();
                 }
 
                 if (event.keyCode === 8) {

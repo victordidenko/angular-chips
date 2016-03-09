@@ -101,12 +101,11 @@ describe('Directive chips : Basic flow', function() {
     it('pressing left and right arrow should focus on chips respectivly',function(){
         //['Apple', 'Cisco', 'Verizon', 'Microsoft'];
         //should focus on last chip when pressing left arrow
-        var ele = getLastChipTmpl(element);
-        var mockEvent = {keyCode: 37, target: ele}
-        spyOn(ele,'focus');
+        var mockEvent = {keyCode: 37, target: element.find('INPUT')[0]}
+        spyOn(getLastChipTmpl(element),'focus');
         //should focus on Microsoft
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(ele.focus).toHaveBeenCalled();
+        expect(getLastChipTmpl(element).focus).toHaveBeenCalled();
 
         //checking right arrow selection
         //should focus on Verizon
@@ -146,6 +145,13 @@ describe('Directive chips : Basic flow', function() {
         isolateScope.chips.handleKeyDown(mockEvent);
         expect(getLastChipTmpl(element,0).focus).toHaveBeenCalled();
 
+    });
+
+    it('check chip selection using left and right arrow key after mouse click',function(){
+        spyOn(getLastChipTmpl(element,2),'focus');
+        var mockEvent = {keyCode: 37, target: getLastChipTmpl(element,2)}
+        isolateScope.chips.handleKeyDown(mockEvent);
+        expect(getLastChipTmpl(element,2).focus).toHaveBeenCalled();
     });
 
     it('check focus and blur on INPUT element ',function(){
