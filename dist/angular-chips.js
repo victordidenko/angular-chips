@@ -1,4 +1,6 @@
 (function() {
+    Chips.$inject = ["$compile", "$timeout", "DomUtil"];
+    ChipsController.$inject = ["$scope", "$element", "DomUtil"];
     angular.module('angular.chips', [])
         .directive('chips', Chips)
         .controller('chipsController', ChipsController);
@@ -70,9 +72,10 @@
         closeParenthesisIndex = funStr.indexOf(')');
         return funStr.substr(openParenthesisIndex, closeParenthesisIndex - openParenthesisIndex);
     }
-
+    /*@ngInject*/
     function Chips($compile, $timeout, DomUtil) {
-
+        /*@ngInject*/
+        linkFun.$inject = ["scope", "iElement", "iAttrs", "ngModelCtrl", "transcludefn"];
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
             if ((error = validation(iElement)) !== '') {
                 throw error;
@@ -224,7 +227,7 @@
             restrict: 'E',
             scope: {
                 /*
-                 * optional callback, this will be called before rendering the data, 
+                 * optional callback, this will be called before rendering the data,
                  * user can modify the data before it's rendered
                  */
                 render: '&?'
@@ -242,7 +245,7 @@
     function validation(element) {
         return element.find('chip-tmpl').length === 0 ? 'should have chip-tmpl' : element.find('chip-tmpl').length > 1 ? 'should have only one chip-tmpl' : '';
     }
-
+    /*@ngInject*/
     function ChipsController($scope, $element, DomUtil) {
         /*toggling input controller focus*/
         this.setFocus = function(flag) {
@@ -259,11 +262,12 @@
 })();
 
 (function() {
+    ChipControlLinkFun.$inject = ["scope", "iElement", "iAttrs", "chipsCtrl"];
     angular.module('angular.chips')
         .directive('chipControl', ChipControl);
 
     /*
-     * It's for normal input element 
+     * It's for normal input element
      * It send the value to chips directive when press the enter button
      */
     function ChipControl() {
@@ -273,7 +277,7 @@
             link: ChipControlLinkFun,
         }
     };
-
+    /*@ngInject*/
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
             if (event.keyCode === 13 && event.target.value !== '') {

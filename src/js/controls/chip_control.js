@@ -3,7 +3,7 @@
         .directive('chipControl', ChipControl);
 
     /*
-     * It's for normal input element 
+     * It's for normal input element
      * It send the value to chips directive when press the enter button
      */
     function ChipControl() {
@@ -13,7 +13,7 @@
             link: ChipControlLinkFun,
         }
     };
-
+    /*@ngInject*/
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
             if (event.keyCode === 13 && event.target.value !== '') {

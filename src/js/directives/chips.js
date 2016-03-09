@@ -70,9 +70,9 @@
         closeParenthesisIndex = funStr.indexOf(')');
         return funStr.substr(openParenthesisIndex, closeParenthesisIndex - openParenthesisIndex);
     }
-
+    /*@ngInject*/
     function Chips($compile, $timeout, DomUtil) {
-
+        /*@ngInject*/
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
             if ((error = validation(iElement)) !== '') {
                 throw error;
@@ -224,7 +224,7 @@
             restrict: 'E',
             scope: {
                 /*
-                 * optional callback, this will be called before rendering the data, 
+                 * optional callback, this will be called before rendering the data,
                  * user can modify the data before it's rendered
                  */
                 render: '&?'
@@ -242,7 +242,7 @@
     function validation(element) {
         return element.find('chip-tmpl').length === 0 ? 'should have chip-tmpl' : element.find('chip-tmpl').length > 1 ? 'should have only one chip-tmpl' : '';
     }
-
+    /*@ngInject*/
     function ChipsController($scope, $element, DomUtil) {
         /*toggling input controller focus*/
         this.setFocus = function(flag) {

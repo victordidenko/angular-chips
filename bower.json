@@ -23,6 +23,7 @@
   ],
   "devDependencies": {
     "angular-bootstrap": "~1.2.1",
+    "components-font-awesome": "~4.5.0",
     "bootstrap": "~3.3.6",
     "angular-mocks": "1.4.8",
   },
