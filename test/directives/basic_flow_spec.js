@@ -79,33 +79,33 @@ describe('Directive chips : Basic flow', function() {
         var event = new Event('keydown', { bubbles: true });
         event.keyCode = 8;
         //will invoke chip_tmpl keydown handler
-        var microsoftChip = getLastChipTmpl(element);
+        var microsoftChip = getChipTmpl(element);
         microsoftChip.dispatchEvent(event);
         //checking is Microsoft removed
-        expect(angular.element(getLastChipTmpl(element)).html()).not.toContain('Microsoft')
-        expect(angular.element(getLastChipTmpl(element)).html()).toContain('Verizon')
+        expect(angular.element(getChipTmpl(element)).html()).not.toContain('Microsoft')
+        expect(angular.element(getChipTmpl(element)).html()).toContain('Verizon')
 
         mockEvent.target = microsoftChip;
-        spyOn(getLastChipTmpl(element), 'focus');
+        spyOn(getChipTmpl(element), 'focus');
         //set focus on last index chip which is Verizon
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element).focus).toHaveBeenCalled()
+        expect(getChipTmpl(element).focus).toHaveBeenCalled()
 
         //focus on chip by pressing left arrow
         mockEvent.keyCode = 37;
-        spyOn(getLastChipTmpl(element, 1), 'focus');
+        spyOn(getChipTmpl(element, 1), 'focus');
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element, 1).focus).toHaveBeenCalled();
+        expect(getChipTmpl(element, 1).focus).toHaveBeenCalled();
     });
 
     it('pressing left and right arrow should focus on chips respectivly',function(){
         //['Apple', 'Cisco', 'Verizon', 'Microsoft'];
         //should focus on last chip when pressing left arrow
         var mockEvent = {keyCode: 37, target: element.find('INPUT')[0]}
-        spyOn(getLastChipTmpl(element),'focus');
+        spyOn(getChipTmpl(element),'focus');
         //should focus on Microsoft
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element).focus).toHaveBeenCalled();
+        expect(getChipTmpl(element).focus).toHaveBeenCalled();
 
         //checking right arrow selection
         //should focus on Verizon
@@ -113,14 +113,14 @@ describe('Directive chips : Basic flow', function() {
         //should focus on Cisco
         isolateScope.chips.handleKeyDown(mockEvent);
         mockEvent.keyCode = 39
-        spyOn(getLastChipTmpl(element,2),'focus');
+        spyOn(getChipTmpl(element,2),'focus');
         //shuld focus on Verizon again
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element,2).focus).toHaveBeenCalled();
+        expect(getChipTmpl(element,2).focus).toHaveBeenCalled();
 
         //keep pressing left arrow
         mockEvent.keyCode = 37;
-        spyOn(getLastChipTmpl(element,1),'focus');
+        spyOn(getChipTmpl(element,1),'focus');
         //focus on Cisco
         isolateScope.chips.handleKeyDown(mockEvent);
         //focus on Apple
@@ -131,27 +131,27 @@ describe('Directive chips : Basic flow', function() {
         isolateScope.chips.handleKeyDown(mockEvent);
         //focus on Cisco
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element,1).focus).toHaveBeenCalled();        
+        expect(getChipTmpl(element,1).focus).toHaveBeenCalled();        
 
 
         //keep pressing right arrow
         mockEvent.keyCode = 39;
-        spyOn(getLastChipTmpl(element,0),'focus');
+        spyOn(getChipTmpl(element,0),'focus');
         //focus on Verizon
         isolateScope.chips.handleKeyDown(mockEvent);
         //focus on Microsoft
         isolateScope.chips.handleKeyDown(mockEvent);
         //focus on Apple
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element,0).focus).toHaveBeenCalled();
+        expect(getChipTmpl(element,0).focus).toHaveBeenCalled();
 
     });
 
     it('check chip selection using left and right arrow key after mouse click',function(){
-        spyOn(getLastChipTmpl(element,2),'focus');
-        var mockEvent = {keyCode: 37, target: getLastChipTmpl(element,2)}
+        spyOn(getChipTmpl(element,2),'focus');
+        var mockEvent = {keyCode: 37, target: getChipTmpl(element,2)}
         isolateScope.chips.handleKeyDown(mockEvent);
-        expect(getLastChipTmpl(element,2).focus).toHaveBeenCalled();
+        expect(getChipTmpl(element,2).focus).toHaveBeenCalled();
     });
 
     it('check focus and blur on INPUT element ',function(){
@@ -166,7 +166,7 @@ describe('Directive chips : Basic flow', function() {
     });
 
     it('clicking on delete icon should delete chip',function(){
-        var chip = getLastChipTmpl(element);
+        var chip = getChipTmpl(element);
         angular.element(chip).find('SPAN')[0].click();
         expect(scope.samples.length).toBe(3);
     });

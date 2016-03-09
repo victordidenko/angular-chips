@@ -4,7 +4,7 @@ function getChipScope(element, index) {
     return angular.element(elements[index]).scope();
 }
 
-function getLastChipTmpl(element, index) {
+function getChipTmpl(element, index) {
     var chipTmpls = element.find('chip-tmpl');
     return chipTmpls[index === undefined ? chipTmpls.length - 1 : index];
 }
