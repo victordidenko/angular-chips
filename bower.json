@@ -1,0 +1,25 @@
+{
+  "name": "angular-chips-gh-pages",
+  "homepage": "https://github.com/mohbasheer/angular-chips",
+  "authors": [
+    "Mohammed Basheer <ssp.basheer@gmail.com>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "angular-chips": "*",
+    "angular-bootstrap": "~1.2.1",
+    "components-font-awesome": "~4.5.0",
+    "bootstrap": "~3.3.6",
+    "angular-mocks": "1.4.8"
+  }
+}
