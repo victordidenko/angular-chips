@@ -2,6 +2,10 @@
 
 Angular-Chips is the angular based component. You can use it to add dynamic chips.
 
+### Install:
+
+bower install angular-chips --save-dev
+
 ### Examples:
 <img src="others/Basic_example.gif">
 
