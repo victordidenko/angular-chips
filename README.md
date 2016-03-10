@@ -16,7 +16,8 @@ Include in you application module.
 
 `angular.module('sample',['angular.chips']);`
 
-[Documentation](http://blog.imaginea.com/angular-chips-documentation/)
+##  [Documentation](http://blog.imaginea.com/angular-chips-documentation/)
+
 
 ### Examples:
 <img src="others/Basic_example.gif">
