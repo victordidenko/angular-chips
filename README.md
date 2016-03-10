@@ -4,7 +4,19 @@ Angular-Chips is the angular based component. You can use it to add dynamic chip
 
 ### Install:
 
-bower install angular-chips --save-dev
+`bower install angular-chips --save-dev`
+
+Include after angular.js script tag
+
+`<script type="text/javascript" src="/bower_components/angular/angular.js"></script>`
+
+`<script type="text/javascript" src="/dist/angular-chips.min.js"></script>`
+
+Include in you application module.
+
+`angular.module('sample',['angular.chips']);`
+
+[Documentation](http://blog.imaginea.com/angular-chips-documentation/)
 
 ### Examples:
 <img src="others/Basic_example.gif">
