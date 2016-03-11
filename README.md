@@ -10,14 +10,13 @@ Include after angular.js script tag
 
 `<script type="text/javascript" src="/bower_components/angular/angular.js"></script>`
 
-`<script type="text/javascript" src="/dist/angular-chips.min.js"></script>`
+`<script type="text/javascript" src="/bower_components/angular-chips/dist/angular-chips.min.js"></script>`
 
 Include in you application module.
 
 `angular.module('sample',['angular.chips']);`
 
-##  [Documentation](http://blog.imaginea.com/angular-chips-documentation/)
-
+<a href="http://blog.imaginea.com/angular-chips-documentation/" target="_blank"><h3>Documentation</h3></a>
 
 ### Examples:
 <img src="others/Basic_example.gif">
