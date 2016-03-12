@@ -1,8 +1,6 @@
 language: node_js
 node_js:
   - "4.2"
-  - "4.1"
-  - "4.0"
   - "0.12"
   - "0.11"
   - "0.10"
@@ -10,5 +8,6 @@ node_js:
   - "0.6"
   - "iojs"
 before_script:
+  - bower install -p
   - npm install -g gulp
 script: gulp test
