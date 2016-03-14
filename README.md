@@ -12,6 +12,10 @@ Include after angular.js script tag
 
 `<script type="text/javascript" src="/bower_components/angular-chips/dist/angular-chips.min.js"></script>`
 
+Include css file:
+
+`<link rel="stylesheet" type="text/css" href="/bower_components/angular-chips/dist/main.css">`
+
 Include in you application module.
 
 `angular.module('sample',['angular.chips']);`
