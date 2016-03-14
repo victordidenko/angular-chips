@@ -48,10 +48,11 @@ Using Promise Markup
     <input chip-control></input>
 </chips>
 ```
-
-
+<br>
 
 [![Build Status](https://travis-ci.org/mohbasheer/angular-chips.svg?branch=master)](https://travis-ci.org/mohbasheer/angular-chips)
+
+[![Gitter](https://badges.gitter.im/mohbasheer/angular-chips.svg)](https://gitter.im/mohbasheer/angular-chips)
 
 <a href="http://blog.imaginea.com/angular-chips-documentation/" target="_blank"><h3>Documentation</h3></a>
 
