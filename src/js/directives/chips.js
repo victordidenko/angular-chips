@@ -13,7 +13,7 @@
     function ngModel(modelCtrl) {
         return {
             add: function(val) {
-                var modelCopy = angular.copy(modelCtrl.$modelValue);
+                var modelCopy = angular.copy(modelCtrl.$modelValue) || [];
                 modelCopy.push(val)
                 modelCtrl.$setViewValue(modelCopy);
             },
@@ -132,7 +132,7 @@
              * ngModel values are copied when it's updated outside
              */
             ngModelCtrl.$render = function() {
-                if (isDeferFlow) {
+                if (isDeferFlow && ngModelCtrl.$modelValue) {
                     var index, list = [];
                     for (index = 0; index < ngModelCtrl.$modelValue.length; index++) {
                         // list.push(ngModelCtrl.$modelValue[index]);
@@ -140,7 +140,7 @@
                     }
                     scope.chips.list = list;
                 } else {
-                    scope.chips.list = angular.copy(ngModelCtrl.$modelValue);
+                    scope.chips.list = angular.copy(ngModelCtrl.$modelValue) || [];
                 }
 
             }
