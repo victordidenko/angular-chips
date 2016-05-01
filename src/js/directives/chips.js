@@ -160,7 +160,10 @@
 
             /*Extract the chip-tmpl and compile inside the chips directive scope*/
             var rootDiv = angular.element('<div></div>');
-            var tmpl = iElement.find('chip-tmpl').remove();
+            var tmplStr = iElement.html();
+            tmplStr = tmplStr.substr(tmplStr.indexOf('<chip-tmpl'),tmplStr.indexOf('</chip-tmpl>')-('</chip-tmpl>').length);
+            iElement.find('chip-tmpl').remove();
+            var tmpl = angular.element(tmplStr);
             var chipTextNode, chipBindedData, chipBindedDataSuffix;
             tmpl.attr('ng-repeat', 'chip in chips.list track by $index');
             tmpl.attr('ng-class', '{\'chip-failed\':chip.isFailed}')
@@ -236,6 +239,7 @@
             controllerAs: 'chips',
             template: '<div ng-transclude></div>'
         }
+
 
     };
     /* <chip-tmpl> tag is mandatory added validation to confirm that*/
