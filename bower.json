@@ -34,5 +34,8 @@
   },
   "dependencies": {
     "angular": "v1.5.5"
+  },
+  "resolutions": {
+    "angular": "v1.5.5"
   }
 }
