@@ -6,7 +6,10 @@
     "Mohammed Basheer"
   ],
   "description": "Angular-Chips is the angular based component. You can use it to add dynamic chips",
-  "main": "./dist/angular-chips.js",
+  "main": [
+    "./dist/angular-chips.js",
+    "./dist/main.css"
+    ],
   "keywords": [
     "angular",
     "chips",
