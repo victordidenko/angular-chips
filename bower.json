@@ -1,6 +1,6 @@
 {
   "name": "angular-chips",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "homepage": "https://github.com/mohbasheer/angular-chips",
   "authors": [
     "Mohammed Basheer"
@@ -9,7 +9,7 @@
   "main": [
     "./dist/angular-chips.js",
     "./dist/main.css"
-    ],
+  ],
   "keywords": [
     "angular",
     "chips",
@@ -38,9 +38,9 @@
     "angular-mocks": "1.4.8"
   },
   "dependencies": {
-    "angular": "v1.5.5"
+    "angular": "v1.5.*"
   },
   "resolutions": {
-    "angular": "v1.5.5"
+    "angular": "v1.5.*"
   }
 }
