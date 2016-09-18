@@ -414,6 +414,7 @@
             if (event.keyCode === 13 && event.target.value !== '') {
                 chipsCtrl.addChip(event.target.value);
                 event.target.value = "";
+                event.preventDefault();
             }
         });
 
