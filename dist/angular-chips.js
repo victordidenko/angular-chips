@@ -102,8 +102,12 @@
                 if (scope.render !== undefined && functionParam !== '') {
                     paramObj = {};
                     paramObj[functionParam] = data;
-                    updatedData = scope.render(paramObj)
+                    updatedData = scope.render(paramObj);
                 } else { updatedData = data }
+
+                if (!updatedData) {
+                  return false;
+                }
 
                 if (isPromiseLike(updatedData)) {
                     updatedData.then(function(response) {
@@ -119,6 +123,8 @@
                     scope.chips.list.push(data);
                     model.add(data);
                 }
+
+                return true;
             };
 
             scope.chips.deleteChip = function(index) {
@@ -412,8 +418,9 @@
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
             if (event.keyCode === 13 && event.target.value !== '') {
-                chipsCtrl.addChip(event.target.value);
-                event.target.value = "";
+                if (chipsCtrl.addChip(event.target.value)) {
+                  event.target.value = "";
+                }
                 event.preventDefault();
             }
         });
@@ -445,8 +452,9 @@
                 ngModelCtrl.$render = function(event) {
                     if (!ngModelCtrl.$modelValue)
                         return;
-                    chipsCtrl.addChip(ngModelCtrl.$modelValue);
-                    iElement.val('');
+                    if (chipsCtrl.addChip(ngModelCtrl.$modelValue)) {
+                      iElement.val('');
+                    }
                 }
 
                 iElement.on('focus', function() {
