@@ -16,8 +16,9 @@
                 ngModelCtrl.$render = function(event) {
                     if (!ngModelCtrl.$modelValue)
                         return;
-                    chipsCtrl.addChip(ngModelCtrl.$modelValue);
-                    iElement.val('');
+                    if (chipsCtrl.addChip(ngModelCtrl.$modelValue)) {
+                      iElement.val('');
+                    }
                 }
 
                 iElement.on('focus', function() {

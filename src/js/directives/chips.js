@@ -99,8 +99,12 @@
                 if (scope.render !== undefined && functionParam !== '') {
                     paramObj = {};
                     paramObj[functionParam] = data;
-                    updatedData = scope.render(paramObj)
+                    updatedData = scope.render(paramObj);
                 } else { updatedData = data }
+
+                if (!updatedData) {
+                  return false;
+                }
 
                 if (isPromiseLike(updatedData)) {
                     updatedData.then(function(response) {
@@ -116,6 +120,8 @@
                     scope.chips.list.push(data);
                     model.add(data);
                 }
+
+                return true;
             };
 
             scope.chips.deleteChip = function(index) {

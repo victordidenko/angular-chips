@@ -17,8 +17,9 @@
     function ChipControlLinkFun(scope, iElement, iAttrs, chipsCtrl) {
         iElement.on('keypress', function(event) {
             if (event.keyCode === 13 && event.target.value !== '') {
-                chipsCtrl.addChip(event.target.value);
-                event.target.value = "";
+                if (chipsCtrl.addChip(event.target.value)) {
+                  event.target.value = "";
+                }
                 event.preventDefault();
             }
         });
