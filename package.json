@@ -1,7 +1,7 @@
 {
   "name": "angular-chips",
-  "version": "1.0.8",
-  "description": "",
+  "version": "1.0.9",
+  "description": "Angular-Chips is the angular based component. You can use it to add dynamic chips or free form tags. check samples directory for more information.",
   "author": "Mohammed Basheer",
   "license": "MIT",
   "devDependencies": {
@@ -23,5 +23,35 @@
     "karma-phantomjs-launcher": "^1.0.0",
     "run-sequence": "^1.1.5",
     "st": "^1.1.0"
-  }
+  },
+  "main": "gulpfile.js",
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "angular",
+    "chips",
+    "multiselect",
+    "single select",
+    "chip with promise",
+    "chips with promise",
+    "tags",
+    "inline tagging",
+    "inline tag",
+    "free form tags",
+    "promise based tags",
+    "promise based chip"
+  ],
+  "dependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohbasheer/angular-chips.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mohbasheer/angular-chips/issues"
+  },
+  "homepage": "https://github.com/mohbasheer/angular-chips#readme"
 }
