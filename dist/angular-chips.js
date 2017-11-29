@@ -1,5 +1,5 @@
 (function() {
-    Chips.$inject = ["$compile", "$timeout", "DomUtil"];
+    Chips.$inject = ["$q", "$compile", "$timeout", "DomUtil"];
     ChipsController.$inject = ["$scope", "$element", "DomUtil"];
     angular.module('angular.chips', [])
         .directive('chips', Chips)
@@ -77,7 +77,7 @@
         return funStr.substr(openParenthesisIndex, closeParenthesisIndex - openParenthesisIndex);
     }
     /*@ngInject*/
-    function Chips($compile, $timeout, DomUtil) {
+    function Chips($q, $compile, $timeout, DomUtil) {
         /*@ngInject*/
         linkFun.$inject = ["scope", "iElement", "iAttrs", "ngModelCtrl", "transcludefn"];
         function linkFun(scope, iElement, iAttrs, ngModelCtrl, transcludefn) {
@@ -120,7 +120,7 @@
                         }
                         var arr = isArray(response) ? response : [response];
                         var first = arr.shift(); // get first element, it will be populated to DeferChip
-                        update(arr.map(function(r) { return { defer: r } })); // add all other elements, if any
+                        update(arr, true); // add all other elements, if any
                         model.add(first);
                         return first;
                     })
@@ -130,10 +130,10 @@
                     update(updatedData);
                 }
 
-                function update(data) {
+                function update(data, defer) {
                     var arr = isArray(data) ? data : [data];
                     for (var i = 0; i < arr.length; i++) {
-                        scope.chips.list.push(arr[i]);
+                        scope.chips.list.push(defer ? new DeferChip(arr[i], $q.when(arr[i])) : arr[i]);
                         model.add(arr[i]);
                     }
                 }
