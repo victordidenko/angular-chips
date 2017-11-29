@@ -9,6 +9,10 @@
         return obj && angular.isFunction(obj.then);
     }
 
+    function isArray(obj) {
+        return Object.prototype.toString.call(obj) === '[object Array]';
+    }
+
     /*
      * update values to ngModel reference
      */
@@ -106,13 +110,20 @@
                 } else { updatedData = data }
 
                 if (!updatedData) {
-                  return false;
+                    return false;
                 }
 
                 if (isPromiseLike(updatedData)) {
-                    updatedData.then(function(response) {
-                        model.add(response);
-                    });
+                    updatedData = updatedData.then(function(response) {
+                        if (response == null || (isArray(response) && !response.length)) {
+                            throw data; // got no data
+                        }
+                        var arr = isArray(response) ? response : [response];
+                        var first = arr.shift(); // get first element, it will be populated to DeferChip
+                        update(arr.map(function(r) { return { defer: r } })); // add all other elements, if any
+                        model.add(first);
+                        return first;
+                    })
                     scope.chips.list.push(new DeferChip(data, updatedData));
                     scope.$apply();
                 } else {
@@ -120,8 +131,11 @@
                 }
 
                 function update(data) {
-                    scope.chips.list.push(data);
-                    model.add(data);
+                    var arr = isArray(data) ? data : [data];
+                    for (var i = 0; i < arr.length; i++) {
+                        scope.chips.list.push(arr[i]);
+                        model.add(arr[i]);
+                    }
                 }
 
                 return true;
